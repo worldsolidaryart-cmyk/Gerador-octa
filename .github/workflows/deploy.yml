@@ -17,7 +17,7 @@ jobs:
   deploy:
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }} # Corrigido aqui (: alterado para .)
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -25,10 +25,9 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: 'npm'
+          node-version: 24 # Atualizado para o Node 24 para sumir com o aviso
       - name: Install dependencies
-        run: npm ci
+        run: npm install # Alterado de 'npm ci' para 'npm install' para aceitar a falta do lock file
       - name: Build
         run: npm run build
       - name: Setup Pages
