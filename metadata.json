@@ -1,0 +1,6 @@
+{
+  "name": "OCTA ENERGIA",
+  "description": "Sistema Inteligente para Dimensionamento de Geradores Cinéticos e Estudo de Viabilidade Econômico-Financeira",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
