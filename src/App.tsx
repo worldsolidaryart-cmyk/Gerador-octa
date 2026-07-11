@@ -616,14 +616,20 @@ export default function App() {
     })
       .then(res => res.json())
       .then(data => {
-        if (data.success) {
-          setGeneratedProposal(data.content);
-          if (data.note) {
+        // Aceita se o status for de sucesso vindo da Vercel
+        if (data.success || data.text) {
+          // Garante a leitura correta independente do nome da propriedade vinda da Vercel
+          setGeneratedProposal(data.content || data.text);
+          
+          if (data.isFallback || data.note) {
             triggerToast("Proposta gerada via motor de contingência local (cota de IA excedida).", "info");
           } else {
             triggerToast("Proposta estruturada criada com sucesso!", "success");
           }
-          setShowPrintModal(true);
+          // Caso seu estado seja diferente de setShowPrintModal, mantenha como estava seu original
+          if (typeof setShowPrintModal === "function") {
+            setShowPrintModal(true);
+          }
         } else {
           triggerToast("Erro ao gerar proposta comercial.", "error");
         }
