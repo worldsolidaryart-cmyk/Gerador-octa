@@ -45,7 +45,7 @@ export default function App() {
 
   // Electricity bill state
   const [electricityBill, setElectricityBill] = useState<ElectricityBill>({
-    clientName: "Supermercado Fratelli S/A",
+    clientName: "Empresa Ltda",
     consumoKwh: 266667,
     tarifa: 0.75,
     valorConta: 200000,
@@ -1785,7 +1785,7 @@ export default function App() {
                             clientName: e.target.value
                           }));
                         }}
-                        placeholder="Ex: Supermercado Fratelli"
+                        placeholder="Ex: Empresa Ltda"
                         className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 transition-all"
                       />
                     </div>
@@ -1800,7 +1800,7 @@ export default function App() {
                             setManualCnpj(e.target.value);
                             setBndesCnpj(e.target.value);
                           }}
-                          placeholder="Ex: 30.717.401/0001-28"
+                          placeholder="Ex: 00.000.000/0001-00"
                           className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono text-slate-800 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 transition-all"
                         />
                       </div>
@@ -1810,7 +1810,7 @@ export default function App() {
                           type="text" 
                           value={manualInscEstadual}
                           onChange={(e) => setManualInscEstadual(e.target.value)}
-                          placeholder="Ex: 06.874.123-9"
+                          placeholder="Ex: 00.000.000-0"
                           className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono text-slate-800 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 transition-all"
                         />
                       </div>
