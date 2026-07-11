@@ -231,7 +231,7 @@ export default function App() {
 
   // CRM Pre-populated Leads
   const [crmLeads, setCrmLeads] = useState<CRMLead[]>([
-    { id: "L-301", name: "Carlos Henrique", company: "Indústria Metalúrgica Sul", phone: "(11) 98765-4321", email: "carlos@metalsul.com.br", billValue: 350000, stage: "proposal", assignedAgent: "Marta Souza", createdAt: "2026-06-01" },
+    { id: "L-301", name: "Marcos Amin", company: "Indústria Metalúrgica Sul", phone: "(11) 98765-4321", email: "carlos@metalsul.com.br", billValue: 350000, stage: "proposal", assignedAgent: "Marta Souza", createdAt: "2026-06-01" },
     { id: "L-302", name: "Roberto Silveira", company: "Supermercado Fratelli S/A", phone: "(19) 99244-1234", email: "roberto@fratelli.com.br", billValue: 200000, stage: "closed", assignedAgent: "Diego Lima", createdAt: "2026-06-05" },
     { id: "L-303", name: "Mariana Costa", company: "Shopping Aliança", phone: "(21) 97111-9988", email: "mariana@shoppingalianca.com.br", billValue: 1800000, stage: "negotiation", assignedAgent: "Marta Souza", createdAt: "2026-06-15" },
     { id: "L-304", name: "Jonas Albuquerque", company: "Frigorífico Boi Gordo", phone: "(43) 98877-6655", email: "jonas@boigordo.ind.br", billValue: 480000, stage: "leads", assignedAgent: "Diego Lima", createdAt: "2026-06-22" }
