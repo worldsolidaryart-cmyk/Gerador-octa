@@ -5,8 +5,7 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
-    // ALTERADO PARA O NOME CORRETO DO SEU REPOSITÓRIO:
-    base: '/Gerador-octa/',
+    // A LINHA DO BASE FOI REMOVIDA PARA DEIXAR A TELA COMPATÍVEL COM A VERCEL
     
     plugins: [react(), tailwindcss()],
     resolve: {
