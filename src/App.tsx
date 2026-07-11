@@ -67,9 +67,9 @@ export default function App() {
   // Numeric inputs for manual adjustments
   const [manualValor, setManualValor] = useState<string>("200000");
   const [manualConsumo, setManualConsumo] = useState<string>("266667");
-  const [manualClientName, setManualClientName] = useState<string>("Supermercado Fratelli S/A");
-  const [manualCnpj, setManualCnpj] = useState<string>("30.717.401/0001-28");
-  const [manualInscEstadual, setManualInscEstadual] = useState<string>("06.874.123-9");
+  const [manualClientName, setManualClientName] = useState<string>("Empresa Ltda");
+  const [manualCnpj, setManualCnpj] = useState<string>("00.000.000/0001-00");
+  const [manualInscEstadual, setManualInscEstadual] = useState<string>("00.000.000-0");
 
   // Selected Generator & Model
   const [selectedGenerator, setSelectedGenerator] = useState<GeneratorModel>(GENERATORS_CATALOG[11]); // Default 500 KVA
@@ -97,11 +97,11 @@ export default function App() {
   const [locacaoInstallmentPercent, setLocacaoInstallmentPercent] = useState<number>(100); // default 100% signal
 
   // BNDES Ficha Cadastral & Documents
-  const [bndesRazaoSocial, setBndesRazaoSocial] = useState<string>("Supermercado Fratelli S/A");
-  const [bndesCnpj, setBndesCnpj] = useState<string>("12.345.678/0001-99");
+  const [bndesRazaoSocial, setBndesRazaoSocial] = useState<string>("Empresa Ltda");
+  const [bndesCnpj, setBndesCnpj] = useState<string>("00.000.000/0001-00");
   const [bndesAnnualRevenue, setBndesAnnualRevenue] = useState<number>(18000000); // 18M R$
   const [bndesFoundedYear, setBndesFoundedYear] = useState<number>(2012);
-  const [bndesRepresentative, setBndesRepresentative] = useState<string>("Carlos Alberto Fratelli");
+  const [bndesRepresentative, setBndesRepresentative] = useState<string>("Nome do Empresário");
   const [bndesDocuments, setBndesDocuments] = useState<Array<{ id: string; name: string; size: string; status: 'Análise' | 'Aprovado' | 'Pendente'; date: string }>>([
     { id: "doc-1", name: "Balanço_Patrimonial_2024.pdf", size: "2.4 MB", status: "Aprovado", date: "30/06/2026" },
     { id: "doc-2", name: "Contrato_Social_Consolidado.pdf", size: "1.8 MB", status: "Aprovado", date: "30/06/2026" },
@@ -231,15 +231,15 @@ export default function App() {
 
   // CRM Pre-populated Leads
   const [crmLeads, setCrmLeads] = useState<CRMLead[]>([
-    { id: "L-301", name: "Carlos Henrique", company: "Indústria Metalúrgica Sul", phone: "(11) 98765-4321", email: "carlos@metalsul.com.br", billValue: 350000, stage: "proposal", assignedAgent: "Marta Souza", createdAt: "2026-06-01" },
-    { id: "L-302", name: "Roberto Silveira", company: "Supermercado Fratelli S/A", phone: "(19) 99244-1234", email: "roberto@fratelli.com.br", billValue: 200000, stage: "closed", assignedAgent: "Diego Lima", createdAt: "2026-06-05" },
-    { id: "L-303", name: "Mariana Costa", company: "Shopping Aliança", phone: "(21) 97111-9988", email: "mariana@shoppingalianca.com.br", billValue: 1800000, stage: "negotiation", assignedAgent: "Marta Souza", createdAt: "2026-06-15" },
-    { id: "L-304", name: "Jonas Albuquerque", company: "Frigorífico Boi Gordo", phone: "(43) 98877-6655", email: "jonas@boigordo.ind.br", billValue: 480000, stage: "leads", assignedAgent: "Diego Lima", createdAt: "2026-06-22" }
+    { id: "L-301", name: "Nome Empresário 1", company: "Empresa 1 Ltda", phone: "(11) 98765-0000", email: "empresa@empresa1.com.br", billValue: 350000, stage: "proposal", assignedAgent: "Marta Souza", createdAt: "2026-06-01" },
+    { id: "L-302", name: "Nome Empresário 2", company: "Empresa Ltda", phone: "(19) 99244-0000", email: "empresa@empresa2.com.br", billValue: 200000, stage: "closed", assignedAgent: "Diego Lima", createdAt: "2026-06-05" },
+    { id: "L-303", name: "Nome Empresário 3", company: "Empresa 3 Ltda", phone: "(21) 97111-0000", email: "empresa@empresa3.com.br", billValue: 1800000, stage: "negotiation", assignedAgent: "Marta Souza", createdAt: "2026-06-15" },
+    { id: "L-304", name: "Nome Empresário 4", company: "Empresa 4 Ltda", phone: "(43) 98877-0000", email: "empresa@empresa4.com.br", billValue: 480000, stage: "leads", assignedAgent: "Diego Lima", createdAt: "2026-06-22" }
   ]);
 
   // Pre-populated Contracts
   const [contracts, setContracts] = useState<CRMContract[]>([
-    { id: "CTR-501", leadId: "L-302", clientName: "Supermercado Fratelli S/A", generatorKva: 500, type: "LOCACAO", value: 1700000, monthlyFee: 100000, startDate: "2026-06-25", endDate: "2031-06-25", status: "Aguardando Assinaturas", gracePeriodMonths: 36, commissionPaid: false, version: 1 }
+    { id: "CTR-501", leadId: "L-302", clientName: "Empresa Ltda", generatorKva: 500, type: "LOCACAO", value: 1700000, monthlyFee: 100000, startDate: "2026-06-25", endDate: "2031-06-25", status: "Aguardando Assinaturas", gracePeriodMonths: 36, commissionPaid: false, version: 1 }
   ]);
 
   const triggerToast = (message: string, type: "success" | "info" | "error" = "success") => {
