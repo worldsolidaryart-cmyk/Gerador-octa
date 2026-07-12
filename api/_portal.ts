@@ -41,9 +41,12 @@ export async function sendMail(to: string, subject: string, html: string) {
     headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ from, to: [to], subject, html }),
   });
-  if (!response.ok) throw new Error('Não foi possível enviar o e-mail.');
+  if (!response.ok) {
+    const errorBody = await response.text();
+    console.error('Resend error:', response.status, errorBody);
+    throw new Error('Não foi possível enviar o e-mail.');
+  }
 }
-
 export function safeError(response: VercelResponse, error: unknown) {
   console.error(error);
   return response.status(500).json({ error: error instanceof Error ? error.message : 'Erro interno.' });
