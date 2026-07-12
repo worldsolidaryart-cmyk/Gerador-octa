@@ -37,11 +37,24 @@ import { recommendGenerator, performFeasibilityAnalysis, GENERATORS_CATALOG } fr
 import { ElectricityBill, GeneratorModel, FinanceAnalysis, CRMLead, CRMContract, CustomerTicket } from "./types";
 import { CorporateProposalLayout } from "./components/CorporateProposalLayout";
 import { CorporateCatalogLayout } from "./components/CorporateCatalogLayout";
+import { isSupabaseConfigured, requestPasswordReset, signInPortal, signUpPortal, type PortalSession } from "./lib/supabaseAuth";
 
 export default function App() {
   // Current role/profile for testing and demo perspectives
   const [currentProfile, setCurrentProfile] = useState<"admin" | "investor" | "client" | "agent">("admin");
   const [activeTab, setActiveTab] = useState<string>("dimensionador");
+  const [portalSession, setPortalSession] = useState<PortalSession | null>(null);
+  const [portalLoginOpen, setPortalLoginOpen] = useState(false);
+  const [portalMode, setPortalMode] = useState<"login" | "register" | "forgot">("login");
+  const [portalLogin, setPortalLogin] = useState("");
+  const [portalPassword, setPortalPassword] = useState("");
+  const [portalName, setPortalName] = useState("");
+  const [portalBusy, setPortalBusy] = useState(false);
+  const [pendingPortal, setPendingPortal] = useState<"investidor" | "cliente" | null>(null);
+  const [proposalEmailOpen, setProposalEmailOpen] = useState(false);
+  const [proposalEmail, setProposalEmail] = useState("");
+  const [proposalAction, setProposalAction] = useState<"generate" | "print" | null>(null);
+  const [clientProposals, setClientProposals] = useState<any[]>([]);
 
   // Electricity bill state
   const [electricityBill, setElectricityBill] = useState<ElectricityBill>({
@@ -565,8 +578,72 @@ export default function App() {
     triggerToast("Dados do formulário e relatórios limpos com sucesso!", "info");
   };
 
+  const openPortal = (portal: "investidor" | "cliente") => {
+    if (!portalSession) {
+      setPendingPortal(portal);
+      setPortalMode("login");
+      setPortalLoginOpen(true);
+      return;
+    }
+    setActiveTab(portal);
+  };
+
+  const loadClientProposals = async (session: PortalSession) => {
+    const response = await fetch("/api/client-proposals", {
+      method: "POST", headers: { Authorization: `Bearer ${session.access_token}` },
+    });
+    if (response.ok) setClientProposals((await response.json()).proposals || []);
+  };
+
+  const submitPortalAccess = async () => {
+    setPortalBusy(true);
+    try {
+      if (portalMode === "forgot") {
+        await requestPasswordReset(portalLogin);
+        triggerToast("Se o acesso existir, enviamos as instruções de redefinição.", "success");
+        setPortalMode("login");
+        return;
+      }
+      const session = portalMode === "register"
+        ? await signUpPortal(portalLogin, portalPassword, portalName)
+        : await signInPortal(portalLogin, portalPassword);
+      if (!session?.access_token) {
+        triggerToast("Confira seu e-mail para confirmar o cadastro antes de entrar.", "info");
+        return;
+      }
+      setPortalSession(session);
+      if (pendingPortal === "cliente") await loadClientProposals(session);
+      setActiveTab(pendingPortal || "cliente");
+      setPortalLoginOpen(false);
+      setPortalPassword("");
+      triggerToast("Acesso ao portal confirmado.", "success");
+    } catch (error: any) {
+      triggerToast(error.message || "Não foi possível concluir o acesso.", "error");
+    } finally {
+      setPortalBusy(false);
+    }
+  };
+
+  const requestProposalEmail = (action: "generate" | "print") => {
+    setProposalAction(action);
+    setProposalEmail(electricityBill.clientName ? proposalEmail : "");
+    setProposalEmailOpen(true);
+  };
+
+  const saveAndEmailProposal = async (email: string, content: string) => {
+    const response = await fetch("/api/create-proposal", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, customerName: electricityBill.clientName, proposalContent: content,
+        generatorKva: selectedGenerator.capacityKva, commercialModel: selectedOption,
+        investment: financeAnalysis?.investment }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Não foi possível enviar a proposta.");
+    triggerToast(`Proposta ${data.proposalNumber} enviada ao cliente com acesso ao portal.`, "success");
+  };
+
   // Generate Technical & Commercial Proposal with Gemini API
-  const generateProposal = () => {
+  const generateProposal = (email?: string) => {
     if (!financeAnalysis) {
       triggerToast("Por favor, realize o dimensionamento primeiro no Simulador.", "info");
       setActiveTab("dimensionador");
@@ -619,7 +696,8 @@ export default function App() {
         // Aceita se o status for de sucesso vindo da Vercel
         if (data.success || data.text) {
           // Garante a leitura correta independente do nome da propriedade vinda da Vercel
-          setGeneratedProposal(data.content || data.text);
+          const proposalContent = data.content || data.text;
+          setGeneratedProposal(proposalContent);
           
           if (data.isFallback || data.note) {
             triggerToast("Proposta gerada via motor de contingência local (cota de IA excedida).", "info");
@@ -627,6 +705,9 @@ export default function App() {
             triggerToast("Proposta estruturada criada com sucesso!", "success");
           }
           // Caso seu estado seja diferente de setShowPrintModal, mantenha como estava seu original
+          if (email) {
+            saveAndEmailProposal(email, proposalContent).catch((error) => triggerToast(error.message, "error"));
+          }
           if (typeof setShowPrintModal === "function") {
             setShowPrintModal(true);
           }
@@ -1577,7 +1658,7 @@ export default function App() {
           <p className="text-[10px] text-slate-500 font-mono font-bold tracking-widest uppercase mt-4 mb-2 px-2">Portais Compartilhados</p>
 
           <div
-            onClick={() => setActiveTab("investidor")}
+            onClick={() => openPortal("investidor")}
             className={`px-4 py-2 rounded-md text-sm font-medium cursor-pointer transition-colors flex items-center gap-2.5 ${
               activeTab === "investidor" 
                 ? "bg-slate-800 text-white font-semibold" 
@@ -1589,7 +1670,7 @@ export default function App() {
           </div>
 
           <div
-            onClick={() => setActiveTab("cliente")}
+            onClick={() => openPortal("cliente")}
             className={`px-4 py-2 rounded-md text-sm font-medium cursor-pointer transition-colors flex items-center gap-2.5 ${
               activeTab === "cliente" 
                 ? "bg-slate-800 text-white font-semibold" 
@@ -1697,13 +1778,7 @@ export default function App() {
                 }} 
               />
               <button 
-                onClick={() => {
-                  if (generatedProposal) {
-                    setShowPrintModal(true);
-                  } else {
-                    generateProposal();
-                  }
-                }}
+                onClick={() => requestProposalEmail(generatedProposal ? "print" : "generate")}
                 className="px-4 py-2 bg-emerald-600 text-white rounded text-sm font-semibold shadow-sm hover:bg-emerald-700 transition-colors cursor-pointer flex items-center gap-1.5"
               >
                 <Printer className="w-4 h-4" />
@@ -2489,7 +2564,7 @@ export default function App() {
               </div>
 
               {/* BNDES Credit Portal - Ficha Cadastral, Condições & Documentos (Visible only when selectedOption is "venda") */}
-              {selectedOption === "venda" && (
+              {false && selectedOption === "venda" && (
                 <div className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-3xl text-white shadow-xl flex flex-col gap-8 animate-fade-in">
                   
                   {/* Portal Header */}
@@ -2774,7 +2849,7 @@ export default function App() {
                         A IA irá utilizar todas as informações do dimensionamento do gerador cinético de <strong>{selectedGenerator.capacityKva} KVA</strong> e dados do cliente para formular o escopo e o memorial descritivo completo.
                       </p>
                       <button
-                        onClick={generateProposal}
+                        onClick={() => requestProposalEmail("generate")}
                         disabled={proposalLoading}
                         className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-100 disabled:text-slate-400 text-white font-bold text-xs py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs"
                       >
@@ -2985,7 +3060,7 @@ export default function App() {
                           </p>
                           <div className="flex gap-2.5 mt-2">
                             <button
-                              onClick={generateProposal}
+                              onClick={() => requestProposalEmail("generate")}
                               className="px-3.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold text-xs rounded-xl transition-all cursor-pointer"
                             >
                               Redigir Proposta Agora
@@ -3008,6 +3083,28 @@ export default function App() {
           {/* TAB 4: PORTAL DO INVESTIDOR */}
           {activeTab === "investidor" && financeAnalysis && (
             <div className="flex flex-col gap-6 animate-fade-in">
+              <div className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-3xl text-white shadow-xl">
+                <div className="flex flex-col md:flex-row justify-between gap-4 pb-5 border-b border-slate-800">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-blue-500/10 text-blue-400 rounded-2xl flex items-center justify-center border border-blue-500/20"><Building className="w-6 h-6" /></div>
+                    <div><span className="text-sm font-bold tracking-wider font-mono uppercase text-blue-400">Canal de Parceria BNDES</span><h3 className="text-xl font-bold font-display mt-1">Portal de Crédito BNDES</h3><p className="text-xs text-slate-400">Ficha cadastral, condições de aprovação e documentos do financiamento.</p></div>
+                  </div>
+                  <span className="self-start px-3 py-1 bg-blue-500/20 text-blue-300 font-bold rounded-full uppercase text-[10px]">BNDES Finame</span>
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mt-6">
+                  <div className="space-y-3"><h4 className="text-xs font-bold uppercase text-slate-400">Ficha Cadastral</h4>
+                    <input value={bndesRazaoSocial} onChange={(e) => setBndesRazaoSocial(e.target.value)} placeholder="Razão Social" className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs" />
+                    <input value={bndesCnpj} onChange={(e) => setBndesCnpj(e.target.value)} placeholder="CNPJ" className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs" />
+                    <input value={bndesRepresentative} onChange={(e) => setBndesRepresentative(e.target.value)} placeholder="Representante legal" className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs" />
+                  </div>
+                  <div className="space-y-3"><h4 className="text-xs font-bold uppercase text-slate-400">Condições de Aprovação</h4>
+                    <p className="bg-slate-800/60 rounded-xl p-3 text-xs">Faturamento anual: <strong>R$ {bndesAnnualRevenue.toLocaleString("pt-BR")}</strong></p>
+                    <input type="number" value={bndesAnnualRevenue} onChange={(e) => setBndesAnnualRevenue(Number(e.target.value))} className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs" />
+                    <p className="bg-slate-800/60 rounded-xl p-3 text-xs">Status: {bndesAnnualRevenue >= financeAnalysis.investment * 2 ? "Crédito pré-aprovado" : "Aguardando revisão"}</p>
+                  </div>
+                  <div><h4 className="text-xs font-bold uppercase text-slate-400 mb-3">Documentação</h4><label className="flex flex-col items-center border-2 border-dashed border-slate-700 rounded-xl p-5 cursor-pointer text-xs"><Upload className="w-6 h-6 mb-2 text-blue-400" />Escolher Arquivo<input type="file" className="hidden" accept="application/pdf,image/*" onChange={handleBndesUpload} multiple /></label><p className="mt-3 text-xs text-slate-400">{bndesDocuments.length} documento(s) verificado(s) via AI</p></div>
+                </div>
+              </div>
               {/* Portfolio stats cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-xs">
@@ -3120,6 +3217,10 @@ export default function App() {
           {/* TAB 5: PORTAL DO CLIENTE */}
           {activeTab === "cliente" && financeAnalysis && (
             <div className="flex flex-col gap-6 animate-fade-in">
+              <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm">
+                <div className="flex items-center justify-between gap-4 mb-4"><div><h3 className="text-base font-bold text-slate-900">Minhas Propostas</h3><p className="text-xs text-slate-500">Documentos vinculados ao seu acesso de cliente.</p></div><button onClick={() => portalSession && loadClientProposals(portalSession)} className="text-xs font-bold text-emerald-700">Atualizar</button></div>
+                {clientProposals.length ? <div className="space-y-3">{clientProposals.map((proposal) => <details key={proposal.proposal_number} className="border border-slate-200 rounded-xl p-3"><summary className="cursor-pointer text-sm font-semibold text-slate-800">{proposal.proposal_number} · {proposal.generator_kva || "—"} KVA</summary><pre className="mt-3 text-xs whitespace-pre-wrap font-sans text-slate-600">{proposal.proposal_content}</pre></details>)}</div> : <p className="text-xs text-slate-500">Nenhuma proposta disponível para este acesso.</p>}
+              </div>
               {/* Telemetry simulator and cost comparison */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Cost Comparison Card */}
@@ -3660,6 +3761,28 @@ export default function App() {
       </main>
 
       {/* MODALS AND OVERLAYS */}
+      {proposalEmailOpen && (
+        <div className="fixed inset-0 z-[60] bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <h3 className="text-lg font-bold text-slate-900">Enviar proposta ao cliente</h3>
+            <p className="text-xs text-slate-500 mt-1">Informe um e-mail válido. A proposta e uma senha exclusiva para o Portal do Cliente serão enviadas para este endereço.</p>
+            <input type="email" value={proposalEmail} onChange={(e) => setProposalEmail(e.target.value)} placeholder="cliente@empresa.com" className="mt-5 w-full border border-slate-300 rounded-xl px-3 py-2 text-sm" />
+            <div className="flex justify-end gap-2 mt-5"><button onClick={() => setProposalEmailOpen(false)} className="px-4 py-2 text-xs font-bold text-slate-600">Cancelar</button><button onClick={() => { if (!/^\S+@\S+\.\S+$/.test(proposalEmail)) return triggerToast("Informe um e-mail válido.", "error"); setProposalEmailOpen(false); if (proposalAction === "print" && generatedProposal) { saveAndEmailProposal(proposalEmail, generatedProposal).catch((error) => triggerToast(error.message, "error")); setShowPrintModal(true); } else generateProposal(proposalEmail); }} className="px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold">Continuar</button></div>
+          </div>
+        </div>
+      )}
+
+      {portalLoginOpen && (
+        <div className="fixed inset-0 z-[60] bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <div className="flex justify-between gap-4"><div><h3 className="text-lg font-bold text-slate-900">Portais Compartilhados</h3><p className="text-xs text-slate-500 mt-1">Acesse com e-mail ou número da proposta e senha.</p></div><button onClick={() => setPortalLoginOpen(false)}><X className="w-5 h-5 text-slate-400" /></button></div>
+            {!isSupabaseConfigured() && <p className="mt-4 p-3 rounded-xl bg-amber-50 text-amber-800 text-xs">Configure as variáveis públicas do Supabase na Vercel para ativar o acesso.</p>}
+            <div className="flex gap-2 mt-5 text-xs font-bold"><button onClick={() => setPortalMode("login")} className={portalMode === "login" ? "text-emerald-700" : "text-slate-400"}>Entrar</button><button onClick={() => setPortalMode("register")} className={portalMode === "register" ? "text-emerald-700" : "text-slate-400"}>Criar conta</button><button onClick={() => setPortalMode("forgot")} className={portalMode === "forgot" ? "text-emerald-700" : "text-slate-400"}>Esqueci a senha</button></div>
+            <div className="space-y-3 mt-4">{portalMode === "register" && <input value={portalName} onChange={(e) => setPortalName(e.target.value)} placeholder="Nome" className="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm" />}<input value={portalLogin} onChange={(e) => setPortalLogin(e.target.value)} placeholder={portalMode === "login" ? "E-mail ou número da proposta" : "E-mail"} className="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm" />{portalMode !== "forgot" && <input type="password" value={portalPassword} onChange={(e) => setPortalPassword(e.target.value)} placeholder="Senha" className="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm" />}</div>
+            <button disabled={portalBusy || !isSupabaseConfigured()} onClick={submitPortalAccess} className="mt-5 w-full py-2.5 rounded-xl bg-emerald-600 disabled:bg-slate-300 text-white text-sm font-bold">{portalBusy ? "Aguarde..." : portalMode === "forgot" ? "Enviar instruções" : portalMode === "register" ? "Criar acesso" : "Entrar no portal"}</button>
+          </div>
+        </div>
+      )}
       {/* 1. PRINT PREVIEW MODAL */}
       {showPrintModal && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
