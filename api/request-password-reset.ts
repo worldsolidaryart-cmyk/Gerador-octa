@@ -20,7 +20,7 @@ export default async function handler(request: VercelRequest, response: VercelRe
     });
     const link = await linkResponse.json();
     if (!linkResponse.ok) throw new Error('Não foi possível gerar o link de redefinição.');
-    await sendMail(destination, 'Redefina sua senha do Portal OCTA', `<p>Para criar uma nova senha, <a href="${link.properties.action_link}">acesse este link seguro</a>.</p>`);
+    await sendMail(destination, 'Redefina sua senha do Portal OCTA', `<p>Para criar uma nova senha, <a href="${link.action_link}">acesse este link seguro</a>.</p>`);
     return response.status(200).json({ ok: true });
   } catch (error) {
     return safeError(response, error);
