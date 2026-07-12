@@ -72,7 +72,7 @@ export default async function handler(
 async function robustGenerateContent(
   aiClient: GoogleGenAI, 
   baseConfig: { contents: any; config?: any }, 
-  modelsToTry = ["gemini-2.5-flash", "gemini-1.5-flash"] // Atualizado para modelos compatíveis
+  modelsToTry = ["gemini-flash-latest", "gemini-2.5-flash"] // Atualizado para modelos compatíveis
 ): Promise<any> {
   let lastError: any = null;
   for (const model of modelsToTry) {
