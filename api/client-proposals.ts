@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { requirePost, safeError, supabase } from './_portal';
+import { requirePost, safeError, supabase } from './_portal.js';
 
 export default async function handler(request: VercelRequest, response: VercelResponse) {
   if (!requirePost(request, response)) return;
