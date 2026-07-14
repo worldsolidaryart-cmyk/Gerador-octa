@@ -595,7 +595,15 @@ export default function App() {
     if (response.ok) setClientProposals((await response.json()).proposals || []);
   };
 
+  const [portalPolling, setPortalPolling] = useState(false);
+  
   const submitPortalAccess = async () => {
+    // Validação de senha ANTES de chamar a API — evita ida e volta desnecessária
+    if ((portalMode === "register" || portalMode === "login") && portalPassword.length < 6) {
+      triggerToast("A senha precisa ter no mínimo 6 caracteres.", "error");
+      return;
+    }
+  
     setPortalBusy(true);
     try {
       if (portalMode === "forgot") {
@@ -604,9 +612,44 @@ export default function App() {
         setPortalMode("login");
         return;
       }
-      const session = portalMode === "register"
-        ? await signUpPortal(portalLogin, portalPassword, portalName)
-        : await signInPortal(portalLogin, portalPassword);
+  
+      if (portalMode === "register") {
+        await signUpPortal(portalLogin, portalPassword, portalName);
+        triggerToast("Cadastro criado! Confira seu e-mail para confirmar antes de entrar.", "info");
+        // Mantém "girando" e fica tentando logar sozinho, esperando a confirmação do e-mail
+        setPortalPolling(true);
+        const deadline = Date.now() + 5 * 60 * 1000; // tenta por até 5 minutos
+        const poll = async () => {
+          if (Date.now() > deadline) {
+            setPortalPolling(false);
+            setPortalBusy(false);
+            triggerToast("Ainda não identificamos a confirmação. Tente entrar novamente após confirmar o e-mail.", "info");
+            return;
+          }
+          try {
+            const session = await signInPortal(portalLogin, portalPassword);
+            if (session?.access_token) {
+              setPortalSession(session);
+              if (pendingPortal === "cliente") await loadClientProposals(session);
+              setActiveTab(pendingPortal || "cliente");
+              setPortalLoginOpen(false);
+              setPortalPassword("");
+              setPortalPolling(false);
+              setPortalBusy(false);
+              triggerToast("E-mail confirmado! Acesso liberado.", "success");
+              return;
+            }
+          } catch {
+            // ainda não confirmou — silencioso, tenta de novo
+          }
+          setTimeout(poll, 4000);
+        };
+        poll();
+        return;
+      }
+  
+      // portalMode === "login"
+      const session = await signInPortal(portalLogin, portalPassword);
       if (!session?.access_token) {
         triggerToast("Confira seu e-mail para confirmar o cadastro antes de entrar.", "info");
         return;
@@ -618,9 +661,16 @@ export default function App() {
       setPortalPassword("");
       triggerToast("Acesso ao portal confirmado.", "success");
     } catch (error: any) {
-      triggerToast(error.message || "Não foi possível concluir o acesso.", "error");
+      const msg = String(error?.message || "");
+      if (msg.toLowerCase().includes("already registered") || msg.toLowerCase().includes("already exists") || msg.toLowerCase().includes("user_already_exists")) {
+        triggerToast("Este e-mail já possui cadastro. Faça login ou clique em 'Esqueci minha senha'.", "error");
+      } else if (msg.toLowerCase().includes("password") && msg.toLowerCase().includes("6")) {
+        triggerToast("A senha precisa ter no mínimo 6 caracteres.", "error");
+      } else {
+        triggerToast(msg || "Não foi possível concluir o acesso.", "error");
+      }
     } finally {
-      setPortalBusy(false);
+      if (portalMode !== "register") setPortalBusy(false);
     }
   };
 
