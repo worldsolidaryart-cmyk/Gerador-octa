@@ -662,7 +662,10 @@ export default function App() {
             const session = await signInPortal(portalLogin, portalPassword);
             if (session?.access_token) {
               setPortalSession(session);
-              if (pendingPortal === "cliente") await loadClientProposals(session);
+              if (pendingPortal === "cliente") {
+                await loadClientProposals(session);
+                await loadClientTickets(session);
+              }
               setActiveTab(pendingPortal || "cliente");
               setPortalLoginOpen(false);
               setPortalPassword("");
@@ -687,7 +690,10 @@ export default function App() {
         return;
       }
       setPortalSession(session);
-      if (pendingPortal === "cliente") await loadClientProposals(session);
+      if (pendingPortal === "cliente") {
+        await loadClientProposals(session);
+        await loadClientTickets(session);
+      }
       setActiveTab(pendingPortal || "cliente");
       setPortalLoginOpen(false);
       setPortalPassword("");
