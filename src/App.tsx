@@ -233,11 +233,9 @@ export default function App() {
     type: "success"
   });
 
-  // Support tickets for client portal
-  const [tickets, setTickets] = useState<CustomerTicket[]>([
-    { id: "TCK-1024", subject: "Dúvida sobre cronograma de entrega", category: "técnico", status: "em_atendimento", createdAt: "2026-06-20", description: "Gostaria de agendar a vistoria da equipe de engenharia para a base de concreto." },
-    { id: "TCK-0985", subject: "Confirmação do primeiro aporte de fabricação", category: "financeiro", status: "resolvido", createdAt: "2026-06-12", description: "Comprovante de 50% de entrada enviado no portal." }
-  ]);
+// Support tickets for client portal — carregados do Supabase via loadClientTickets()
+  const [tickets, setTickets] = useState<any[]>([]);
+  
   const [newTicketSubject, setNewTicketSubject] = useState("");
   const [newTicketDesc, setNewTicketDesc] = useState("");
   const [newTicketCat, setNewTicketCat] = useState<"manutenção" | "financeiro" | "técnico" | "outros">("técnico");
