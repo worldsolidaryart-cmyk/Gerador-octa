@@ -3809,7 +3809,17 @@ export default function App() {
 
         </div>
       </main>
-
+      
+      {portalSession && (
+        <button
+          onClick={handlePortalLogout}
+          className="fixed top-6 left-6 z-[100] flex items-center gap-2 bg-white border border-slate-200 px-3 py-2 rounded-xl shadow-lg text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-rose-600 transition-colors"
+        >
+          <X className="w-4 h-4" />
+          Sair do portal
+        </button>
+      )}
+      
       {/* MODALS AND OVERLAYS */}
       {proposalEmailOpen && (
         <div className="fixed inset-0 z-[60] bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
