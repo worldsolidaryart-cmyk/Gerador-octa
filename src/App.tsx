@@ -593,13 +593,6 @@ export default function App() {
     if (response.ok) setClientProposals((await response.json()).proposals || []);
   };
 
-  const loadClientProposals = async (session: PortalSession) => {
-    const response = await fetch("/api/client-proposals", {
-      method: "POST", headers: { Authorization: `Bearer ${session.access_token}` },
-    });
-    if (response.ok) setClientProposals((await response.json()).proposals || []);
-  };
-
   const loadClientTickets = async (session: PortalSession) => {
     const response = await fetch("/api/client-tickets", {
       method: "POST", headers: { Authorization: `Bearer ${session.access_token}` },
