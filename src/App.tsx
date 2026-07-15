@@ -3829,7 +3829,18 @@ export default function App() {
             {!isSupabaseConfigured() && <p className="mt-4 p-3 rounded-xl bg-amber-50 text-amber-800 text-xs">Configure as variáveis públicas do Supabase na Vercel para ativar o acesso.</p>}
             <div className="flex gap-2 mt-5 text-xs font-bold"><button onClick={() => setPortalMode("login")} className={portalMode === "login" ? "text-emerald-700" : "text-slate-400"}>Entrar</button><button onClick={() => setPortalMode("register")} className={portalMode === "register" ? "text-emerald-700" : "text-slate-400"}>Criar conta</button><button onClick={() => setPortalMode("forgot")} className={portalMode === "forgot" ? "text-emerald-700" : "text-slate-400"}>Esqueci a senha</button></div>
             <div className="space-y-3 mt-4">{portalMode === "register" && <input value={portalName} onChange={(e) => setPortalName(e.target.value)} placeholder="Nome" className="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm" />}<input value={portalLogin} onChange={(e) => setPortalLogin(e.target.value)} placeholder={portalMode === "login" ? "E-mail ou número da proposta" : "E-mail"} className="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm" />{portalMode !== "forgot" && <input type="password" value={portalPassword} onChange={(e) => setPortalPassword(e.target.value)} placeholder="Senha" className="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm" />}</div>
-            <button disabled={portalBusy || !isSupabaseConfigured()} onClick={submitPortalAccess} className="mt-5 w-full py-2.5 rounded-xl bg-emerald-600 disabled:bg-slate-300 text-white text-sm font-bold">{portalBusy ? "Aguarde..." : portalMode === "forgot" ? "Enviar instruções" : portalMode === "register" ? "Criar acesso" : "Entrar no portal"}</button>
+            <button disabled={portalBusy || !isSupabaseConfigured()} onClick={submitPortalAccess} className="mt-5 w-full py-2.5 rounded-xl bg-emerald-600 disabled:bg-slate-300 text-white text-sm font-bold flex items-center justify-center gap-2">
+              {portalBusy && <RefreshCw className="w-4 h-4 animate-spin" />}
+              {portalPolling
+                ? "Aguardando confirmação do e-mail..."
+                : portalBusy
+                ? "Aguarde..."
+                : portalMode === "forgot"
+                ? "Enviar instruções"
+                : portalMode === "register"
+                ? "Criar acesso"
+                : "Entrar no portal"}
+            </button>
           </div>
         </div>
       )}
