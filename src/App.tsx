@@ -1630,24 +1630,31 @@ export default function App() {
   };
 
   // Create client ticket
-  const handleCreateTicket = (e: React.FormEvent) => {
+  const handleCreateTicket = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTicketSubject || !newTicketDesc) {
       triggerToast("Preencha todos os campos do chamado.", "error");
       return;
     }
-    const newTck: CustomerTicket = {
-      id: `TCK-${Math.floor(1000 + Math.random() * 9000)}`,
-      subject: newTicketSubject,
-      category: newTicketCat,
-      status: "aberto",
-      createdAt: new Date().toISOString().split("T")[0],
-      description: newTicketDesc
-    };
-    setTickets([newTck, ...tickets]);
-    setNewTicketSubject("");
-    setNewTicketDesc("");
-    triggerToast("Chamado técnico aberto com sucesso!", "success");
+    if (!portalSession?.access_token) {
+      triggerToast("Sessão expirada. Faça login novamente.", "error");
+      return;
+    }
+    try {
+      const response = await fetch("/api/create-ticket", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${portalSession.access_token}` },
+        body: JSON.stringify({ subject: newTicketSubject, description: newTicketDesc, category: newTicketCat }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Não foi possível abrir o chamado.");
+      setTickets([data.ticket, ...tickets]);
+      setNewTicketSubject("");
+      setNewTicketDesc("");
+      triggerToast("Chamado técnico aberto com sucesso!", "success");
+    } catch (error: any) {
+      triggerToast(error.message || "Não foi possível abrir o chamado.", "error");
+    }
   };
 
   // Drag and drop lead stage update simulation
