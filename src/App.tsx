@@ -1631,7 +1631,7 @@ export default function App() {
     <div className="flex h-screen w-full bg-slate-50 font-sans text-slate-800 overflow-hidden selection:bg-emerald-500 selection:text-white">
       {/* Toast Notification */}
       {toast.show && (
-        <div className="fixed top-6 right-6 z-50 max-w-sm bg-white border border-slate-200 p-4 rounded-xl shadow-lg animate-fade-in flex items-start gap-3">
+        <div className="fixed top-6 right-6 z-[100] max-w-sm bg-white border border-slate-200 p-4 rounded-xl shadow-lg animate-fade-in flex items-start gap-3">
           <div className={`p-1.5 rounded-lg ${toast.type === "success" ? "bg-emerald-50 text-emerald-600 border border-emerald-100" : toast.type === "error" ? "bg-rose-50 text-rose-600 border border-rose-100" : "bg-cyan-50 text-cyan-600 border border-cyan-100"}`}>
             <Award className="w-5 h-5" />
           </div>
