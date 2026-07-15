@@ -3476,11 +3476,11 @@ export default function App() {
                       <div key={tck.id} className="bg-slate-50 p-4 rounded-xl border border-slate-200 flex items-start justify-between gap-3">
                         <div className="flex flex-col gap-1">
                           <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-mono text-slate-400">{tck.id}</span>
+                            <span className="text-[10px] font-mono text-slate-400">TCK-{tck.id.slice(0, 8).toUpperCase()}</span>
                             <span className="text-xs font-semibold text-slate-900">{tck.subject}</span>
                           </div>
                           <p className="text-xs text-slate-600">{tck.description}</p>
-                          <span className="text-[10px] text-slate-400 mt-1 font-mono">Aberto em: {tck.createdAt}</span>
+                          <span className="text-[10px] text-slate-400 mt-1 font-mono">Aberto em: {new Date(tck.created_at).toLocaleDateString("pt-BR")}</span>
                         </div>
 
                         <div>
