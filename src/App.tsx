@@ -596,6 +596,26 @@ export default function App() {
   };
 
   const [portalPolling, setPortalPolling] = useState(false);
+
+  const handlePortalLogout = async () => {
+    try {
+      if (portalSession?.access_token) {
+        await fetch(`${import.meta.env.VITE_SUPABASE_URL}/auth/v1/logout`, {
+          method: "POST",
+          headers: {
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${portalSession.access_token}`,
+          },
+        });
+      }
+    } catch {
+      // mesmo se a chamada remota falhar, ainda limpamos a sessão local
+    } finally {
+      setPortalSession(null);
+      setActiveTab("dimensionador");
+      triggerToast("Sessão encerrada com sucesso.", "info");
+    }
+  };
   
   const submitPortalAccess = async () => {
     // Validação de senha ANTES de chamar a API — evita ida e volta desnecessária
