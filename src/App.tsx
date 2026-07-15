@@ -1762,6 +1762,16 @@ export default function App() {
             <Users className="w-4 h-4" />
             <span>CRM / Leads</span>
           </div>
+
+          {portalSession && (
+            <div
+              onClick={handlePortalLogout}
+              className="px-4 py-2 rounded-md text-sm font-medium cursor-pointer transition-colors flex items-center gap-2.5 text-slate-400 hover:text-rose-400 hover:bg-slate-800/50 mt-2 border-t border-slate-800 pt-4"
+            >
+              <X className="w-4 h-4" />
+              <span>Sair do portal</span>
+            </div>
+          )} 
         </nav>
 
         {/* System Health */}
