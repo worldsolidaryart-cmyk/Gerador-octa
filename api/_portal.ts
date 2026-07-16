@@ -59,3 +59,18 @@ export function requirePost(request: VercelRequest, response: VercelResponse) {
   }
   return true;
 }
+
+export async function requireAdmin(request: VercelRequest, response: VercelResponse): Promise<string | null> {
+  const token = request.headers.authorization?.replace(/^Bearer\s+/i, '');
+  if (!token) { response.status(401).json({ error: 'Sessão ausente.' }); return null; }
+  const userResponse = await supabase('/auth/v1/user', { headers: { Authorization: `Bearer ${token}` } });
+  const user = await userResponse.json();
+  if (!userResponse.ok) { response.status(401).json({ error: 'Sessão inválida.' }); return null; }
+  const profileResponse = await supabase(`/rest/v1/profiles?id=eq.${user.id}&select=role`);
+  const profile = await profileResponse.json();
+  if (!profileResponse.ok || !profile?.[0] || profile[0].role !== 'admin') {
+    response.status(403).json({ error: 'Acesso restrito a administradores.' });
+    return null;
+  }
+  return user.id;
+}
