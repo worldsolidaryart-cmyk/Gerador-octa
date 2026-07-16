@@ -3,6 +3,8 @@ import { proposalLoginEmail, proposalNumber, randomPassword, requirePost, safeEr
 
 export default async function handler(request: VercelRequest, response: VercelResponse) {
   if (!requirePost(request, response)) return;
+  const adminId = await requireAdmin(request, response);
+  if (!adminId) return;
   const { email, customerName, proposalContent, generatorKva, commercialModel, investment } = request.body || {};
   if (!email || !/^\S+@\S+\.\S+$/.test(email) || !proposalContent) {
     return response.status(400).json({ error: 'E-mail válido e proposta são obrigatórios.' });
