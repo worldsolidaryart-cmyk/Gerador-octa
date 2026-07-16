@@ -3538,6 +3538,17 @@ export default function App() {
                           </div>
                           <p className="text-xs text-slate-600">{tck.description}</p>
                           <span className="text-[10px] text-slate-400 mt-1 font-mono">Aberto em: {new Date(tck.created_at).toLocaleDateString("pt-BR")}</span>
+
+                          {tck.ticket_replies?.length > 0 && (
+                            <div className="mt-2 space-y-1.5 bg-white rounded-lg p-2.5 border border-slate-200">
+                              {tck.ticket_replies.map((reply: any) => (
+                                <p key={reply.id} className="text-xs">
+                                  <span className="font-bold text-emerald-700">Suporte OCTA:</span>{" "}
+                                  <span className="text-slate-600">{reply.message}</span>
+                                </p>
+                              ))}
+                            </div>
+                          )}
                         </div>
 
                         <div>
@@ -3554,6 +3565,11 @@ export default function App() {
                           {tck.status === "resolvido" && (
                             <span className="text-[10px] px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-full font-mono font-medium">
                               Resolvido
+                            </span>
+                          )}
+                          {tck.status === "cancelado" && (
+                            <span className="text-[10px] px-2 py-0.5 bg-slate-100 text-slate-500 border border-slate-200 rounded-full font-mono font-medium">
+                              Cancelado
                             </span>
                           )}
                         </div>
