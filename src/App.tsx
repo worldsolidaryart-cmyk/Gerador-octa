@@ -44,6 +44,10 @@ export default function App() {
   const [currentProfile, setCurrentProfile] = useState<"admin" | "investor" | "client" | "agent">("admin");
   const [activeTab, setActiveTab] = useState<string>("dimensionador");
   const [portalSession, setPortalSession] = useState<PortalSession | null>(null);
+  const [adminProposals, setAdminProposals] = useState<any[]>([]);
+  const [adminProposalSearch, setAdminProposalSearch] = useState("");
+  const [adminClients, setAdminClients] = useState<any[]>([]);
+  const [selectedClientProposal, setSelectedClientProposal] = useState<any | null>(null);
   const [portalRole, setPortalRole] = useState<string | null>(null);
   const [adminTickets, setAdminTickets] = useState<any[]>([]);
   const [adminTicketFilter, setAdminTicketFilter] = useState<string>("");
@@ -286,6 +290,14 @@ export default function App() {
     if (activeTab === "admin-tickets" && portalRole === "admin") loadAdminTickets();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, adminTicketFilter]);
+
+  useEffect(() => {
+    if (activeTab === "admin-proposals" && portalRole === "admin") {
+      loadAdminProposals();
+      loadAdminClients();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
   
   // PDF & Signature states
   const [showPrintModal, setShowPrintModal] = useState<boolean>(false);
@@ -600,7 +612,11 @@ export default function App() {
     const response = await fetch("/api/client-proposals", {
       method: "POST", headers: { Authorization: `Bearer ${session.access_token}` },
     });
-    if (response.ok) setClientProposals((await response.json()).proposals || []);
+    if (response.ok) {
+      const list = (await response.json()).proposals || [];
+      setClientProposals(list);
+      if (list.length) setSelectedClientProposal(list[0]);
+    }
   };
 
   const loadClientTickets = async (session: PortalSession) => {
@@ -646,6 +662,42 @@ export default function App() {
       await loadAdminTickets();
     } catch (error: any) {
       triggerToast(error.message || "Não foi possível atualizar o chamado.", "error");
+    }
+  };
+
+  const loadAdminProposals = async () => {
+    if (!portalSession?.access_token) return;
+    const response = await fetch("/api/admin/proposals", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${portalSession.access_token}` },
+      body: JSON.stringify({ search: adminProposalSearch || undefined }),
+    });
+    if (response.ok) setAdminProposals((await response.json()).proposals || []);
+    else triggerToast("Não foi possível carregar as propostas.", "error");
+  };
+
+  const loadAdminClients = async () => {
+    if (!portalSession?.access_token) return;
+    const response = await fetch("/api/admin/clients", {
+      method: "POST", headers: { Authorization: `Bearer ${portalSession.access_token}` },
+    });
+    if (response.ok) setAdminClients((await response.json()).clients || []);
+  };
+
+  const linkProposalToClient = async (proposalId: string, clientId: string) => {
+    if (!portalSession?.access_token) return;
+    try {
+      const response = await fetch("/api/admin/link-proposal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${portalSession.access_token}` },
+        body: JSON.stringify({ proposalId, clientId: clientId || null }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Não foi possível atualizar a vinculação.");
+      triggerToast(clientId ? "Proposta vinculada com sucesso." : "Vinculação removida.", "success");
+      await loadAdminProposals();
+    } catch (error: any) {
+      triggerToast(error.message || "Não foi possível atualizar a vinculação.", "error");
     }
   };
   
@@ -1852,6 +1904,19 @@ export default function App() {
             >
               <ShieldCheck className="w-4 h-4" />
               <span>Painel Admin: Chamados</span>
+            </div>
+          )}
+          {portalSession && portalRole === "admin" && (
+            <div
+              onClick={() => setActiveTab("admin-proposals")}
+              className={`px-4 py-2 rounded-md text-sm font-medium cursor-pointer transition-colors flex items-center gap-2.5 ${
+                activeTab === "admin-proposals" 
+                  ? "bg-slate-800 text-white font-semibold" 
+                  : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+              }`}
+            >
+              <FileText className="w-4 h-4" />
+              <span>Painel Admin: Propostas</span>
             </div>
           )}
         </nav>
@@ -3378,11 +3443,48 @@ export default function App() {
 
           {/* TAB 5: PORTAL DO CLIENTE */}
           {activeTab === "cliente" && financeAnalysis && (
-            <div className="flex flex-col gap-6 animate-fade-in">
-              <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm">
-                <div className="flex items-center justify-between gap-4 mb-4"><div><h3 className="text-base font-bold text-slate-900">Minhas Propostas</h3><p className="text-xs text-slate-500">Documentos vinculados ao seu acesso de cliente.</p></div><button onClick={() => portalSession && loadClientProposals(portalSession)} className="text-xs font-bold text-emerald-700">Atualizar</button></div>
-                {clientProposals.length ? <div className="space-y-3">{clientProposals.map((proposal) => <details key={proposal.proposal_number} className="border border-slate-200 rounded-xl p-3"><summary className="cursor-pointer text-sm font-semibold text-slate-800">{proposal.proposal_number} · {proposal.generator_kva || "—"} KVA</summary><pre className="mt-3 text-xs whitespace-pre-wrap font-sans text-slate-600">{proposal.proposal_content}</pre></details>)}</div> : <p className="text-xs text-slate-500">Nenhuma proposta disponível para este acesso.</p>}
+            <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm">
+                <div className="flex items-center justify-between gap-4 mb-4"><div><h3 className="text-base font-bold text-slate-900">Minhas Propostas</h3><p className="text-xs text-slate-500">Selecione uma proposta para ver os detalhes em destaque.</p></div><button onClick={() => portalSession && loadClientProposals(portalSession)} className="text-xs font-bold text-emerald-700">Atualizar</button></div>
+                {clientProposals.length ? (
+                  <div className="space-y-2">
+                    {clientProposals.map((proposal) => (
+                      <div
+                        key={proposal.proposal_number}
+                        onClick={() => setSelectedClientProposal(proposal)}
+                        className={`border rounded-xl p-3 cursor-pointer transition-colors ${selectedClientProposal?.proposal_number === proposal.proposal_number ? "border-emerald-500 bg-emerald-50" : "border-slate-200 hover:bg-slate-50"}`}
+                      >
+                        <p className="text-sm font-semibold text-slate-800">{proposal.proposal_number} · {proposal.generator_kva || "—"} KVA</p>
+                        <p className="text-xs text-slate-500">{proposal.commercial_model === "venda" ? "Venda Direta / BNDES" : "Locação Estruturada"} · {new Date(proposal.created_at).toLocaleDateString("pt-BR")}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : <p className="text-xs text-slate-500">Nenhuma proposta disponível para este acesso.</p>}
               </div>
+
+              {selectedClientProposal && (
+                <div className="bg-slate-900 text-white p-6 rounded-2xl shadow-sm">
+                  <div className="flex items-center justify-between gap-4 mb-4">
+                    <div>
+                      <p className="text-[10px] uppercase tracking-wide text-emerald-400 font-bold">Proposta selecionada</p>
+                      <h3 className="text-lg font-bold">{selectedClientProposal.proposal_number}</h3>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-2xl font-bold text-emerald-400">{selectedClientProposal.investment ? selectedClientProposal.investment.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "—"}</p>
+                      <p className="text-[10px] text-slate-400">Investimento total</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
+                    <div><p className="text-slate-400 text-[10px] uppercase">Potência</p><p className="font-bold">{selectedClientProposal.generator_kva || "—"} KVA</p></div>
+                    <div><p className="text-slate-400 text-[10px] uppercase">Modelo</p><p className="font-bold">{selectedClientProposal.commercial_model === "venda" ? "Venda/BNDES" : "Locação"}</p></div>
+                    <div><p className="text-slate-400 text-[10px] uppercase">Cliente</p><p className="font-bold">{selectedClientProposal.customer_name || "—"}</p></div>
+                    <div><p className="text-slate-400 text-[10px] uppercase">Emitida em</p><p className="font-bold">{new Date(selectedClientProposal.created_at).toLocaleDateString("pt-BR")}</p></div>
+                  </div>
+                  <details>
+                    <summary className="cursor-pointer text-xs font-bold text-emerald-400">Ver proposta completa</summary>
+                    <pre className="mt-3 text-xs whitespace-pre-wrap font-sans text-slate-300 bg-slate-800 rounded-lg p-3">{selectedClientProposal.proposal_content}</pre>
+                  </details>
+                </div>
+              )}              
               {/* Telemetry simulator and cost comparison */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Cost Comparison Card */}
@@ -3649,6 +3751,45 @@ export default function App() {
                     ))}
                   </div>
                 ) : <p className="text-xs text-slate-500">Nenhum chamado encontrado.</p>}
+              </div>
+            </div>
+          )}
+
+          {activeTab === "admin-proposals" && portalRole === "admin" && (
+            <div className="flex flex-col gap-6 animate-fade-in">
+              <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm">
+                <div className="flex items-center justify-between gap-4 mb-4 flex-wrap">
+                  <div><h3 className="text-base font-bold text-slate-900">Painel Admin: Propostas</h3><p className="text-xs text-slate-500">Vincule propostas geradas a um perfil de cliente cadastrado.</p></div>
+                  <div className="flex gap-2 items-center">
+                    <input value={adminProposalSearch} onChange={(e) => setAdminProposalSearch(e.target.value)} onKeyDown={(e) => e.key === "Enter" && loadAdminProposals()} placeholder="Buscar por número/cliente" className="border border-slate-300 rounded-lg px-2 py-1.5 text-xs" />
+                    <button onClick={loadAdminProposals} className="text-xs font-bold text-emerald-700 px-2">Buscar</button>
+                  </div>
+                </div>
+                {adminProposals.length ? (
+                  <div className="space-y-3">
+                    {adminProposals.map((prop) => (
+                      <div key={prop.id} className="border border-slate-200 rounded-xl p-4 flex items-center justify-between gap-3 flex-wrap">
+                        <div>
+                          <p className="text-sm font-semibold text-slate-900">{prop.proposal_number} · {prop.generator_kva || "—"} KVA</p>
+                          <p className="text-xs text-slate-500">{prop.customer_name || prop.customer_email} · {new Date(prop.created_at).toLocaleDateString("pt-BR")}</p>
+                          <p className="text-[10px] text-slate-400 mt-1">
+                            {prop.client ? <>Vinculada a: <span className="font-semibold text-emerald-700">{prop.client.display_name || prop.client.email}</span></> : <span className="text-amber-600 font-semibold">Sem cliente vinculado</span>}
+                          </p>
+                        </div>
+                        <select
+                          value={prop.owner_id || ""}
+                          onChange={(e) => linkProposalToClient(prop.id, e.target.value)}
+                          className="border border-slate-300 rounded-lg px-2 py-1.5 text-xs font-semibold"
+                        >
+                          <option value="">— Sem cliente —</option>
+                          {adminClients.map((c) => (
+                            <option key={c.id} value={c.id}>{c.display_name || c.email}</option>
+                          ))}
+                        </select>
+                      </div>
+                    ))}
+                  </div>
+                ) : <p className="text-xs text-slate-500">Nenhuma proposta encontrada.</p>}
               </div>
             </div>
           )}
