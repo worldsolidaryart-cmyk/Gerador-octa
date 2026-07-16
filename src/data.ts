@@ -15,7 +15,7 @@ export const GENERATORS_CATALOG: GeneratorModel[] = [
     area: "2 a 3 m²",
     rendimento: "97% (Apenas 3% de perdas)",
     highlights: ["Operação extremamente silenciosa (<50 dB)", "Livre de combustão ou emissão de CO₂"],
-    imageUrl: "/src/assets/images/octa_compact_generator_1782531644439.jpg"
+    imageUrl: "/images/octa_compact_generator_1782531644439.jpg"
   },
   {
     capacityKva: 30,
@@ -31,7 +31,7 @@ export const GENERATORS_CATALOG: GeneratorModel[] = [
     area: "3 a 5 m²",
     rendimento: "97% (Apenas 3% de perdas)",
     highlights: ["Carenagem de aço galvanizado antiferrugem", "Livre de combustão ou emissão de CO₂"],
-    imageUrl: "/src/assets/images/octa_compact_generator_1782531644439.jpg"
+    imageUrl: "/images/octa_compact_generator_1782531644439.jpg"
   },
   {
     capacityKva: 50,
@@ -47,7 +47,7 @@ export const GENERATORS_CATALOG: GeneratorModel[] = [
     area: "4 a 6 m²",
     rendimento: "97% (Apenas 3% de perdas)",
     highlights: ["Ampla isolação magnética de alta performance", "Controle digital integrado com CLP industrial"],
-    imageUrl: "/src/assets/images/octa_compact_generator_1782531644439.jpg"
+    imageUrl: "/images/octa_compact_generator_1782531644439.jpg"
   },
   {
     capacityKva: 100,
@@ -63,7 +63,7 @@ export const GENERATORS_CATALOG: GeneratorModel[] = [
     area: "5 a 8 m²",
     rendimento: "97% (Apenas 3% de perdas)",
     highlights: ["Operação silenciosa (carenagem acústica)", "Livre de combustão ou emissão de CO₂"],
-    imageUrl: "/src/assets/images/octa_compact_generator_1782531644439.jpg"
+    imageUrl: "/images/octa_compact_generator_1782531644439.jpg"
   },
   {
     capacityKva: 150,
@@ -79,7 +79,7 @@ export const GENERATORS_CATALOG: GeneratorModel[] = [
     area: "6 a 10 m²",
     rendimento: "97% (Apenas 3% de perdas)",
     highlights: ["Operação contínua 24/7 (Base Load)", "Cabine com isolamento térmico e acústico de alta performance"],
-    imageUrl: "/src/assets/images/octa_compact_generator_1782531644439.jpg"
+    imageUrl: "/images/octa_compact_generator_1782531644439.jpg"
   },
   {
     capacityKva: 200,
@@ -95,7 +95,7 @@ export const GENERATORS_CATALOG: GeneratorModel[] = [
     area: "6 a 10 m²",
     rendimento: "97% (Apenas 3% de perdas)",
     highlights: ["Carenagem acústica isolante de alta performance", "Rendimento real constante sem fadiga mecânica"],
-    imageUrl: "/src/assets/images/octa_medium_generator_1782531660782.jpg"
+    imageUrl: "/images/octa_medium_generator_1782531660782.jpg"
   },
   {
     capacityKva: 250,
@@ -111,7 +111,7 @@ export const GENERATORS_CATALOG: GeneratorModel[] = [
     area: "8 a 12 m²",
     rendimento: "97% de eficiência eletromecânica",
     highlights: ["Sistema GAEL de propensão eletromecânica magnética", "Rotor de alta inércia assistido por neodímio"],
-    imageUrl: "/src/assets/images/octa_medium_generator_1782531660782.jpg"
+    imageUrl: "/images/octa_medium_generator_1782531660782.jpg"
   },
   {
     capacityKva: 300,
@@ -127,7 +127,7 @@ export const GENERATORS_CATALOG: GeneratorModel[] = [
     area: "8 a 15 m²",
     rendimento: "97% (Apenas ~3% de perdas projetadas)",
     highlights: ["Concepção avançada de baixíssimo ruído", "Interface digital de controle inteligente com monitoramento remoto IoT"],
-    imageUrl: "/src/assets/images/octa_medium_generator_1782531660782.jpg"
+    imageUrl: "/images/octa_medium_generator_1782531660782.jpg"
   },
   {
     capacityKva: 350,
@@ -143,7 +143,7 @@ export const GENERATORS_CATALOG: GeneratorModel[] = [
     area: "9 a 16 m²",
     rendimento: "97% de eficiência contínua",
     highlights: ["Cabine com tampas laterais fechadas e blindadas contra intempéries", "Design aerodinâmico selado sem chaminés de escape ou silenciadores aparentes"],
-    imageUrl: "/src/assets/images/octa_heavy_generator_1782531673702.jpg"
+    imageUrl: "/images/octa_heavy_generator_1782531673702.jpg"
   },
   {
     capacityKva: 400,
@@ -159,7 +159,7 @@ export const GENERATORS_CATALOG: GeneratorModel[] = [
     area: "10 a 17 m²",
     rendimento: "97% de rendimento permanente",
     highlights: ["Carenagem de isolamento térmico e acústico profundo (Tampas Laterais Seladas)", "Design flush sem descargas ou silenciadores externos visíveis"],
-    imageUrl: "/src/assets/images/octa_heavy_generator_1782531673702.jpg"
+    imageUrl: "/images/octa_heavy_generator_1782531673702.jpg"
   },
   {
     capacityKva: 450,
@@ -175,7 +175,7 @@ export const GENERATORS_CATALOG: GeneratorModel[] = [
     area: "10 a 18 m²",
     rendimento: "97% (Altíssima linearidade de geração)",
     highlights: ["Carenagem de isolamento térmico e acústico profundo (Tampas Laterais Seladas)", "Design flush sem descargas ou silenciadores externos visíveis"],
-    imageUrl: "/src/assets/images/octa_heavy_generator_1782531673702.jpg"
+    imageUrl: "/images/octa_heavy_generator_1782531673702.jpg"
   },
   {
     capacityKva: 500,
@@ -191,7 +191,7 @@ export const GENERATORS_CATALOG: GeneratorModel[] = [
     area: "10 a 18 m²",
     rendimento: "97% de rendimento contínuo",
     highlights: ["Geração de 324.000 kWh/mês com fator de carga de 90%", "Cabine com tampas laterais fechadas e blindadas contra intempéries"],
-    imageUrl: "/src/assets/images/octa_heavy_generator_1782531673702.jpg"
+    imageUrl: "/images/octa_heavy_generator_1782531673702.jpg"
   },
   {
     capacityKva: 1000,
@@ -207,7 +207,7 @@ export const GENERATORS_CATALOG: GeneratorModel[] = [
     area: "15 a 30 m²",
     rendimento: "97% de rendimento permanente",
     highlights: ["Configuração modular em contêiner marítimo acústico blindado", "Múltiplas unidades operando em paralelo com facilidade"],
-    imageUrl: "/src/assets/images/octa_megawatt_station_1782531685594.jpg"
+    imageUrl: "/images/octa_megawatt_station_1782531685594.jpg"
   }
 ];
 
