@@ -3441,10 +3441,25 @@ export default function App() {
             </div>
           )}
 
-          {/* TAB 5: PORTAL DO CLIENTE */}
+          {/* TAB 5: PORTAL DO CLIENTE */}          
           {activeTab === "cliente" && financeAnalysis && (
-            <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm">
-                <div className="flex items-center justify-between gap-4 mb-4"><div><h3 className="text-base font-bold text-slate-900">Minhas Propostas</h3><p className="text-xs text-slate-500">Selecione uma proposta para ver os detalhes em destaque.</p></div><button onClick={() => portalSession && loadClientProposals(portalSession)} className="text-xs font-bold text-emerald-700">Atualizar</button></div>
+            <div className="flex flex-col gap-6 animate-fade-in">
+              
+              {/* Card 1: Lista de Propostas */}
+              <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm">
+                <div className="flex items-center justify-between gap-4 mb-4">
+                  <div>
+                    <h3 className="text-base font-bold text-slate-900">Minhas Propostas</h3>
+                    <p className="text-xs text-slate-500">Selecione uma proposta para ver os detalhes em destaque.</p>
+                  </div>
+                  <button 
+                    onClick={() => portalSession && loadClientProposals(portalSession)} 
+                    className="text-xs font-bold text-emerald-700"
+                  >
+                    Atualizar
+                  </button>
+                </div>
+                
                 {clientProposals.length ? (
                   <div className="space-y-2">
                     {clientProposals.map((proposal) => (
@@ -3458,9 +3473,12 @@ export default function App() {
                       </div>
                     ))}
                   </div>
-                ) : <p className="text-xs text-slate-500">Nenhuma proposta disponível para este acesso.</p>}
+                ) : (
+                  <p className="text-xs text-slate-500">Nenhuma proposta disponível para este acesso.</p>
+                )}
               </div>
 
+              {/* Card 2: Proposta Selecionada (Exibida dinamicamente) */}
               {selectedClientProposal && (
                 <div className="bg-slate-900 text-white p-6 rounded-2xl shadow-sm">
                   <div className="flex items-center justify-between gap-4 mb-4">
@@ -3469,7 +3487,9 @@ export default function App() {
                       <h3 className="text-lg font-bold">{selectedClientProposal.proposal_number}</h3>
                     </div>
                     <div className="text-right">
-                      <p className="text-2xl font-bold text-emerald-400">{selectedClientProposal.investment ? selectedClientProposal.investment.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "—"}</p>
+                      <p className="text-2xl font-bold text-emerald-400">
+                        {selectedClientProposal.investment ? selectedClientProposal.investment.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "—"}
+                      </p>
                       <p className="text-[10px] text-slate-400">Investimento total</p>
                     </div>
                   </div>
@@ -3485,9 +3505,11 @@ export default function App() {
                   </details>
                 </div>
               )}              
-              {/* Telemetry simulator and cost comparison */}
+              
+              {/* Card 3: Simulador de Telemetria e Comparativo de Custos */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Cost Comparison Card */}
+                
+                {/* Comparativo Financeiro */}
                 <div className="bg-white border border-slate-200 p-6 rounded-2xl flex flex-col justify-between gap-6 shadow-sm">
                   <div>
                     <h3 className="text-base font-bold text-slate-900 mb-2">Seu Plano de Economia Energética</h3>
@@ -3533,7 +3555,7 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Generator telemetry simulation */}
+                {/* Telemetria do Ativo */}
                 <div className="bg-white border border-slate-200 p-6 rounded-2xl flex flex-col justify-between gap-4 shadow-sm">
                   <div>
                     <div className="flex justify-between items-center mb-2">
@@ -3560,23 +3582,25 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Operational indicators bar */}
                   <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs">
                     <div className="flex justify-between text-slate-500 mb-1.5">
                       <span>Geração Diária Média:</span>
-                      <strong className="text-slate-900 font-bold">{Math.round((selectedGenerator.generationKwh * (selectedOption === "venda" ? quantityVenda : quantityLocacao)) / 30).toLocaleString("pt-BR")} kWh/dia</strong>
+                      <strong className="text-slate-900 font-bold">
+                        {Math.round((selectedGenerator.generationKwh * (selectedOption === "venda" ? quantityVenda : quantityLocacao)) / 30).toLocaleString("pt-BR")} kWh/dia
+                      </strong>
                     </div>
                     <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
                       <div className="bg-emerald-500 h-full w-[90%]"></div>
                     </div>
                   </div>
                 </div>
+
               </div>
 
-              {/* Customer Service and Helpdesk Tickets */}
+              {/* Card 4: Área de Suporte Técnico e Helpdesk */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 
-                {/* Create ticket form */}
+                {/* Formulário para Abrir Chamado */}
                 <div className="lg:col-span-1 bg-white border border-slate-200 p-6 rounded-2xl shadow-sm">
                   <h4 className="text-sm font-bold text-slate-900 mb-4">Abrir Chamado de Suporte</h4>
                   
@@ -3626,7 +3650,7 @@ export default function App() {
                   </form>
                 </div>
 
-                {/* Ticket history list */}
+                {/* Histórico de Chamados */}
                 <div className="lg:col-span-2 bg-white border border-slate-200 p-6 rounded-2xl flex flex-col gap-4 shadow-sm">
                   <h4 className="text-sm font-bold text-slate-900">Seus Chamados e Solicitações</h4>
                   
@@ -3681,9 +3705,9 @@ export default function App() {
                 </div>
 
               </div>
+              
             </div>
           )}
-
           {activeTab === "admin-tickets" && portalRole === "admin" && (
             <div className="flex flex-col gap-6 animate-fade-in">
               <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm">
