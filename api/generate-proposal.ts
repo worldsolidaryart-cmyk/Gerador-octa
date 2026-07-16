@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { GoogleGenAI } from "@google/genai";
+import { requireAdmin } from './_portal.js';
 
 // Inicializa a API do Gemini fora da função para economizar memória (Serverless Cold Start)
 const apiKey = process.env.GEMINI_API_KEY;
@@ -24,6 +25,10 @@ export default async function handler(
   if (request.method !== 'POST') {
     return response.status(405).json({ error: 'Método não permitido. Use POST.' });
   }
+
+  // 1.5. Permite apenas administradores autenticados
+  const adminId = await requireAdmin(request, response);
+  if (!adminId) return;
 
   // 2. Extrai os dados enviados pelo Front-end do formulário
   const { clientData, generatorData, financeData, selectedOption } = request.body;
