@@ -44,6 +44,11 @@ export default function App() {
   const [currentProfile, setCurrentProfile] = useState<"admin" | "investor" | "client" | "agent">("admin");
   const [activeTab, setActiveTab] = useState<string>("dimensionador");
   const [portalSession, setPortalSession] = useState<PortalSession | null>(null);
+  const [portalRole, setPortalRole] = useState<string | null>(null);
+  const [adminTickets, setAdminTickets] = useState<any[]>([]);
+  const [adminTicketFilter, setAdminTicketFilter] = useState<string>("");
+  const [adminTicketSearch, setAdminTicketSearch] = useState("");
+  const [adminReplyDrafts, setAdminReplyDrafts] = useState<Record<string, string>>({});
   const [portalLoginOpen, setPortalLoginOpen] = useState(false);
   const [portalMode, setPortalMode] = useState<"login" | "register" | "forgot">("login");
   const [portalLogin, setPortalLogin] = useState("");
@@ -277,6 +282,11 @@ export default function App() {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    if (activeTab === "admin-tickets" && portalRole === "admin") loadAdminTickets();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, adminTicketFilter]);
+  
   // PDF & Signature states
   const [showPrintModal, setShowPrintModal] = useState<boolean>(false);
   const [showCatalogPrintModal, setShowCatalogPrintModal] = useState<boolean>(false);
@@ -599,6 +609,45 @@ export default function App() {
     });
     if (response.ok) setTickets((await response.json()).tickets || []);
   };
+
+  const checkPortalRole = async (session: PortalSession) => {
+    try {
+      const response = await fetch("/api/whoami", {
+        method: "POST", headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      if (response.ok) setPortalRole((await response.json()).role || null);
+    } catch { /* silencioso */ }
+  };
+
+  const loadAdminTickets = async () => {
+    if (!portalSession?.access_token) return;
+    const response = await fetch("/api/admin/tickets", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${portalSession.access_token}` },
+      body: JSON.stringify({ status: adminTicketFilter || undefined, search: adminTicketSearch || undefined }),
+    });
+    if (response.ok) setAdminTickets((await response.json()).tickets || []);
+    else triggerToast("Não foi possível carregar os chamados.", "error");
+  };
+
+  const submitAdminTicketUpdate = async (ticketId: string, status?: string) => {
+    if (!portalSession?.access_token) return;
+    const message = adminReplyDrafts[ticketId]?.trim();
+    try {
+      const response = await fetch("/api/admin/ticket-reply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${portalSession.access_token}` },
+        body: JSON.stringify({ ticketId, message: message || undefined, status }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Não foi possível atualizar o chamado.");
+      setAdminReplyDrafts((prev) => ({ ...prev, [ticketId]: "" }));
+      triggerToast("Chamado atualizado.", "success");
+      await loadAdminTickets();
+    } catch (error: any) {
+      triggerToast(error.message || "Não foi possível atualizar o chamado.", "error");
+    }
+  };
   
   const [portalPolling, setPortalPolling] = useState(false);
 
@@ -617,6 +666,7 @@ export default function App() {
       // mesmo se a chamada remota falhar, ainda limpamos a sessão local
     } finally {
       setPortalSession(null);
+      setPortalRole(null);
       setActiveTab("dimensionador");
       triggerToast("Sessão encerrada com sucesso.", "info");
     }
@@ -655,6 +705,7 @@ export default function App() {
             const session = await signInPortal(portalLogin, portalPassword);
             if (session?.access_token) {
               setPortalSession(session);
+              await checkPortalRole(session);
               if (pendingPortal === "cliente") {
                 await loadClientProposals(session);
                 await loadClientTickets(session);
@@ -713,7 +764,7 @@ export default function App() {
 
   const saveAndEmailProposal = async (email: string, content: string) => {
     const response = await fetch("/api/create-proposal", {
-      method: "POST", headers: { "Content-Type": "application/json" },
+      method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${portalSession?.access_token}` },
       body: JSON.stringify({ email, customerName: electricityBill.clientName, proposalContent: content,
         generatorKva: selectedGenerator.capacityKva, commercialModel: selectedOption,
         investment: financeAnalysis?.investment }),
@@ -737,7 +788,7 @@ export default function App() {
 
     fetch("/api/generate-proposal", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${portalSession?.access_token}` },
       body: JSON.stringify({
         clientData: electricityBill,
         generatorData: {
@@ -1780,7 +1831,6 @@ export default function App() {
             <Users className="w-4 h-4" />
             <span>CRM / Leads</span>
           </div>
-
           {portalSession && (
             <div
               onClick={handlePortalLogout}
@@ -1789,7 +1839,20 @@ export default function App() {
               <X className="w-4 h-4" />
               <span>Sair do portal</span>
             </div>
-          )} 
+          )}
+          {portalSession && portalRole === "admin" && (
+            <div
+              onClick={() => setActiveTab("admin-tickets")}
+              className={`px-4 py-2 rounded-md text-sm font-medium cursor-pointer transition-colors flex items-center gap-2.5 ${
+                activeTab === "admin-tickets" 
+                  ? "bg-slate-800 text-white font-semibold" 
+                  : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+              }`}
+            >
+              <ShieldCheck className="w-4 h-4" />
+              <span>Painel Admin: Chamados</span>
+            </div>
+          )}
         </nav>
 
         {/* System Health */}
@@ -3502,6 +3565,77 @@ export default function App() {
             </div>
           )}
 
+          {activeTab === "admin-tickets" && portalRole === "admin" && (
+            <div className="flex flex-col gap-6 animate-fade-in">
+              <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm">
+                <div className="flex items-center justify-between gap-4 mb-4 flex-wrap">
+                  <div><h3 className="text-base font-bold text-slate-900">Painel Admin: Chamados</h3><p className="text-xs text-slate-500">Todos os chamados abertos pelos clientes.</p></div>
+                  <div className="flex gap-2 items-center">
+                    <select value={adminTicketFilter} onChange={(e) => setAdminTicketFilter(e.target.value)} className="border border-slate-300 rounded-lg px-2 py-1.5 text-xs">
+                      <option value="">Todos os status</option>
+                      <option value="aberto">Aberto</option>
+                      <option value="em_atendimento">Em Atendimento</option>
+                      <option value="resolvido">Resolvido</option>
+                      <option value="cancelado">Cancelado</option>
+                    </select>
+                    <input value={adminTicketSearch} onChange={(e) => setAdminTicketSearch(e.target.value)} onKeyDown={(e) => e.key === "Enter" && loadAdminTickets()} placeholder="Buscar por cliente/assunto" className="border border-slate-300 rounded-lg px-2 py-1.5 text-xs" />
+                    <button onClick={loadAdminTickets} className="text-xs font-bold text-emerald-700 px-2">Buscar</button>
+                  </div>
+                </div>
+                {adminTickets.length ? (
+                  <div className="space-y-4">
+                    {adminTickets.map((tck) => (
+                      <div key={tck.id} className="border border-slate-200 rounded-xl p-4">
+                        <div className="flex justify-between items-start flex-wrap gap-2">
+                          <div>
+                            <span className="text-[10px] font-mono text-slate-400">TCK-{tck.id.slice(0, 8).toUpperCase()}</span>
+                            <p className="text-sm font-semibold text-slate-900">{tck.subject}</p>
+                            <p className="text-xs text-slate-500">{tck.client?.display_name || tck.client?.email || "Cliente sem nome"} · {tck.category}</p>
+                          </div>
+                          <select
+                            value={tck.status}
+                            onChange={(e) => submitAdminTicketUpdate(tck.id, e.target.value)}
+                            className="border border-slate-300 rounded-lg px-2 py-1 text-xs font-semibold"
+                          >
+                            <option value="aberto">Aberto</option>
+                            <option value="em_atendimento">Em Atendimento</option>
+                            <option value="resolvido">Resolvido</option>
+                            <option value="cancelado">Cancelado</option>
+                          </select>
+                        </div>
+                        <p className="text-xs text-slate-600 mt-2">{tck.description}</p>
+                        <p className="text-[10px] text-slate-400 font-mono mt-1">Aberto em {new Date(tck.created_at).toLocaleDateString("pt-BR")} · Atualizado em {new Date(tck.updated_at).toLocaleDateString("pt-BR")}</p>
+
+                        {tck.ticket_replies?.length > 0 && (
+                          <div className="mt-3 space-y-2 bg-slate-50 rounded-lg p-3">
+                            {tck.ticket_replies.map((reply: any) => (
+                              <div key={reply.id} className="text-xs">
+                                <span className={`font-bold ${reply.author_role === "admin" ? "text-emerald-700" : "text-slate-700"}`}>
+                                  {reply.author_role === "admin" ? "Você (admin)" : "Cliente"}:
+                                </span>{" "}
+                                <span className="text-slate-600">{reply.message}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        <div className="flex gap-2 mt-3">
+                          <input
+                            value={adminReplyDrafts[tck.id] || ""}
+                            onChange={(e) => setAdminReplyDrafts((prev) => ({ ...prev, [tck.id]: e.target.value }))}
+                            placeholder="Escrever resposta ao cliente..."
+                            className="flex-1 border border-slate-300 rounded-lg px-2 py-1.5 text-xs"
+                          />
+                          <button onClick={() => submitAdminTicketUpdate(tck.id)} className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold">Responder</button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : <p className="text-xs text-slate-500">Nenhum chamado encontrado.</p>}
+              </div>
+            </div>
+          )}
+          
           {/* TAB 6: CRM / LEADS */}
           {activeTab === "crm" && financeAnalysis && (
             <div className="flex flex-col gap-6 animate-fade-in">
