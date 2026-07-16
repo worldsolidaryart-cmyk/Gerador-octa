@@ -9,7 +9,7 @@ export default async function handler(request: VercelRequest, response: VercelRe
     const userResponse = await supabase('/auth/v1/user', { headers: { Authorization: `Bearer ${token}` } });
     const user = await userResponse.json();
     if (!userResponse.ok) return response.status(401).json({ error: 'Sessão inválida.' });
-    const ticketsResponse = await supabase(`/rest/v1/tickets?owner_id=eq.${user.id}&select=id,subject,category,status,description,created_at&order=created_at.desc`);
+    const ticketsResponse = await supabase(`/rest/v1/tickets?owner_id=eq.${user.id}&select=id,subject,category,status,description,created_at,updated_at,ticket_replies(id,author_role,message,created_at)&order=created_at.desc`);
     if (!ticketsResponse.ok) throw new Error('Não foi possível carregar os chamados.');
     return response.status(200).json({ tickets: await ticketsResponse.json() });
   } catch (error) {
