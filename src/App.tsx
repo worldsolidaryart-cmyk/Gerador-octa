@@ -734,6 +734,7 @@ export default function App() {
         return;
       }
       setPortalSession(session);
+      await checkPortalRole(session);
       if (pendingPortal === "cliente") {
         await loadClientProposals(session);
         await loadClientTickets(session);
