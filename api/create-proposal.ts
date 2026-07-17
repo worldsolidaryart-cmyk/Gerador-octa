@@ -3,7 +3,7 @@ import { proposalLoginEmail, proposalNumber, randomPassword, requirePost, safeEr
 
 export default async function handler(request: VercelRequest, response: VercelResponse) {
   if (!requirePost(request, response)) return;
-  const { email, customerName, proposalContent, generatorKva, commercialModel, investment } = request.body || {};
+  const { email, customerName, proposalContent, generatorKva, commercialModel, investment, oldBillValue, clientPayment, generationKwh, gracePeriodMonths } = request.body || {};
   if (!email || !/^\S+@\S+\.\S+$/.test(email) || !proposalContent) {
     return response.status(400).json({ error: 'E-mail válido e proposta são obrigatórios.' });
   }
@@ -26,6 +26,8 @@ export default async function handler(request: VercelRequest, response: VercelRe
         proposal_number: number, owner_id: user.id, customer_email: email.toLowerCase(),
         customer_name: customerName || null, generator_kva: generatorKva || null,
         commercial_model: commercialModel || null, investment: investment || null, proposal_content: proposalContent,
+        old_bill_value: oldBillValue || null, client_payment: clientPayment || null,
+        generation_kwh: generationKwh || null, grace_period_months: gracePeriodMonths || null,
       }),
     });
     if (!proposalResponse.ok) throw new Error('Não foi possível salvar a proposta.');
