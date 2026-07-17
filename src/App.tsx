@@ -3393,10 +3393,11 @@ export default function App() {
             </div>
           )}
                     
-            {/* TAB 4: PORTAL DO INVESTIDOR */}
+          {/* TAB 4: PORTAL DO INVESTIDOR */}
           {activeTab === "investidor" && financeAnalysis && portalRole === "admin" && (
             <div className="flex flex-col gap-6 animate-fade-in">
-
+          
+              {/* Configurações da Plataforma */}
               <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm">
                 <h3 className="text-base font-bold text-slate-900 mb-1">Configurações da Plataforma</h3>
                 <p className="text-xs text-slate-500 mb-4">Regras de negócio globais — afetam todas as novas propostas geradas no site.</p>
@@ -3455,30 +3456,47 @@ export default function App() {
                   Salvar Configurações
                 </button>
               </div>
-
-            <div className="flex flex-col gap-6 animate-fade-in">
+          
+              {/* Portal de Crédito BNDES */}
               <div className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-3xl text-white shadow-xl">
                 <div className="flex flex-col md:flex-row justify-between gap-4 pb-5 border-b border-slate-800">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-blue-500/10 text-blue-400 rounded-2xl flex items-center justify-center border border-blue-500/20"><Building className="w-6 h-6" /></div>
-                    <div><span className="text-sm font-bold tracking-wider font-mono uppercase text-blue-400">Canal de Parceria BNDES</span><h3 className="text-xl font-bold font-display mt-1">Portal de Crédito BNDES</h3><p className="text-xs text-slate-400">Ficha cadastral, condições de aprovação e documentos do financiamento.</p></div>
+                    <div className="w-12 h-12 bg-blue-500/10 text-blue-400 rounded-2xl flex items-center justify-center border border-blue-500/20">
+                      <Building className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <span className="text-sm font-bold tracking-wider font-mono uppercase text-blue-400">Canal de Parceria BNDES</span>
+                      <h3 className="text-xl font-bold font-display mt-1">Portal de Crédito BNDES</h3>
+                      <p className="text-xs text-slate-400">Ficha cadastral, condições de aprovação e documentos do financiamento.</p>
+                    </div>
                   </div>
                   <span className="self-start px-3 py-1 bg-blue-500/20 text-blue-300 font-bold rounded-full uppercase text-[10px]">BNDES Finame</span>
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mt-6">
-                  <div className="space-y-3"><h4 className="text-xs font-bold uppercase text-slate-400">Ficha Cadastral</h4>
+                  <div className="space-y-3">
+                    <h4 className="text-xs font-bold uppercase text-slate-400">Ficha Cadastral</h4>
                     <input value={bndesRazaoSocial} onChange={(e) => setBndesRazaoSocial(e.target.value)} placeholder="Razão Social" className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs" />
                     <input value={bndesCnpj} onChange={(e) => setBndesCnpj(e.target.value)} placeholder="CNPJ" className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs" />
                     <input value={bndesRepresentative} onChange={(e) => setBndesRepresentative(e.target.value)} placeholder="Representante legal" className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs" />
                   </div>
-                  <div className="space-y-3"><h4 className="text-xs font-bold uppercase text-slate-400">Condições de Aprovação</h4>
+                  <div className="space-y-3">
+                    <h4 className="text-xs font-bold uppercase text-slate-400">Condições de Aprovação</h4>
                     <p className="bg-slate-800/60 rounded-xl p-3 text-xs">Faturamento anual: <strong>R$ {bndesAnnualRevenue.toLocaleString("pt-BR")}</strong></p>
                     <input type="number" value={bndesAnnualRevenue} onChange={(e) => setBndesAnnualRevenue(Number(e.target.value))} className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs" />
                     <p className="bg-slate-800/60 rounded-xl p-3 text-xs">Status: {bndesAnnualRevenue >= financeAnalysis.investment * 2 ? "Crédito pré-aprovado" : "Aguardando revisão"}</p>
                   </div>
-                  <div><h4 className="text-xs font-bold uppercase text-slate-400 mb-3">Documentação</h4><label className="flex flex-col items-center border-2 border-dashed border-slate-700 rounded-xl p-5 cursor-pointer text-xs"><Upload className="w-6 h-6 mb-2 text-blue-400" />Escolher Arquivo<input type="file" className="hidden" accept="application/pdf,image/*" onChange={handleBndesUpload} multiple /></label><p className="mt-3 text-xs text-slate-400">{bndesDocuments.length} documento(s) verificado(s) via AI</p></div>
+                  <div>
+                    <h4 className="text-xs font-bold uppercase text-slate-400 mb-3">Documentação</h4>
+                    <label className="flex flex-col items-center border-2 border-dashed border-slate-700 rounded-xl p-5 cursor-pointer text-xs">
+                      <Upload className="w-6 h-6 mb-2 text-blue-400" />
+                      Escolher Arquivo
+                      <input type="file" className="hidden" accept="application/pdf,image/*" onChange={handleBndesUpload} multiple />
+                    </label>
+                    <p className="mt-3 text-xs text-slate-400">{bndesDocuments.length} documento(s) verificado(s) via AI</p>
+                  </div>
                 </div>
               </div>
+          
               {/* Portfolio stats cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-xs">
@@ -3502,14 +3520,14 @@ export default function App() {
                   <p className="text-[9px] text-slate-500 mt-1">ROI real estimado de {financeAnalysis.roi.toFixed(0)}%</p>
                 </div>
               </div>
-
+          
               {/* Debt and Cash Flow Tables */}
               <div className="bg-white border border-slate-200 p-6 rounded-2xl flex flex-col gap-6 shadow-sm">
                 <div>
                   <h3 className="text-base font-bold text-slate-900">Cronograma e Projeção Financeira</h3>
                   <p className="text-xs text-slate-500">Detalhamento mês a mês dos recebíveis, amortizações BNDES e fluxo de caixa líquido</p>
                 </div>
-
+          
                 <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
                   <table className="w-full text-left border-collapse">
                     <thead>
@@ -3546,7 +3564,7 @@ export default function App() {
                         monthsToShow.push(grace + 36);
                         monthsToShow.push(grace + 48);
                         monthsToShow.push(grace + 60);
-
+          
                         return monthsToShow.map((month) => {
                           const isGrace = month <= grace;
                           const payment = isGrace ? 0 : financeAnalysis.clientPayment;
@@ -3585,9 +3603,9 @@ export default function App() {
                   </table>
                 </div>
               </div>
+          
             </div>
           )}
-
           {/* TAB 5: PORTAL DO CLIENTE */}          
           {activeTab === "cliente" && financeAnalysis && (
             <div className="flex flex-col gap-6 animate-fade-in">
