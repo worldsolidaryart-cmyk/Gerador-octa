@@ -4308,7 +4308,7 @@ export default function App() {
               {/* Exact A4 simulation sheet */}
               <div 
                 id="print-target-area" 
-                className="bg-white w-full max-w-[210mm] min-h-[297mm] border border-slate-200 shadow-lg relative print:shadow-none print:border-none print:p-0"
+                className="bg-white w-full max-w-[210mm] min-h-[297mm] border border-slate-200 shadow-lg relative print:shadow-none print:border-none print:p-0 print:min-h-0"
               >
                 <CorporateProposalLayout
                   generatedProposal={generatedProposal}
