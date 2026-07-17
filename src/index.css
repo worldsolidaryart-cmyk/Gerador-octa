@@ -60,12 +60,14 @@
     visibility: hidden !important;
   }
 
-  /* CORREÇÃO CIRÚRGICA: Revela o modal ativo E garante que elementos com quebra de página (como a Capa) fiquem visíveis */
+  /* CORREÇÃO CIRÚRGICA: Revela o modal ativo E garante que a Capa (com suas respectivas classes de quebra) ignore o apagão */
   .fixed, 
   .fixed *,
   .break-after-page,
   .page-break,
-  div[class*="break-after-page"] {
+  .page-break-after-always,
+  div[class*="break-after-page"],
+  div[class*="page-break"] {
     visibility: visible !important;
   }
 
