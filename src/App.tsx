@@ -828,7 +828,12 @@ export default function App() {
       method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${portalSession?.access_token}` },
       body: JSON.stringify({ email, customerName: electricityBill.clientName, proposalContent: content,
         generatorKva: selectedGenerator.capacityKva, commercialModel: selectedOption,
-        investment: financeAnalysis?.investment }),
+        investment: financeAnalysis?.investment,
+        oldBillValue: electricityBill.valorConta,
+        clientPayment: financeAnalysis?.clientPayment,
+        generationKwh: Math.round((selectedGenerator.generationKwh * (selectedOption === "venda" ? quantityVenda : quantityLocacao)) / 30),
+        gracePeriodMonths: selectedOption === "venda" ? bndesGraceMonths : financeAnalysis?.gargantuaGracePeriod,
+      }),
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || "Não foi possível enviar a proposta.");
@@ -3555,7 +3560,7 @@ export default function App() {
                   <div className="flex items-center justify-between gap-4 mt-2">
                     <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 w-full text-center">
                       <span className="text-[10px] text-slate-400 font-mono uppercase block font-bold">Custo Antigo (Média)</span>
-                      <p className="text-lg font-bold text-rose-600 mt-1 font-mono">R$ {electricityBill.valorConta.toLocaleString("pt-BR")}</p>
+                      <p className="text-lg font-bold text-rose-600 mt-1 font-mono">R$ {(selectedClientProposal?.old_bill_value ?? electricityBill.valorConta).toLocaleString("pt-BR")}</p>
                       <span className="text-[9px] text-slate-400 mt-1 block">Pago para Concessionária</span>
                     </div>
 
@@ -3565,7 +3570,7 @@ export default function App() {
 
                     <div className="bg-emerald-50/50 p-4 rounded-xl border border-emerald-200 w-full text-center">
                       <span className="text-[10px] text-emerald-700 font-mono uppercase block font-bold">Novo Custo Mensal</span>
-                      <p className="text-lg font-bold text-emerald-700 mt-1 font-mono">R$ {financeAnalysis.clientPayment.toLocaleString("pt-BR")}</p>
+                      <p className="text-lg font-bold text-emerald-700 mt-1 font-mono">R$ {(selectedClientProposal?.client_payment ?? financeAnalysis.clientPayment).toLocaleString("pt-BR")}</p>
                       <span className="text-[9px] text-emerald-600 mt-1 block font-medium">Economia Garantida de 50%</span>
                     </div>
                   </div>
@@ -3574,18 +3579,18 @@ export default function App() {
                     <div className="flex justify-between items-center mb-2">
                       <span>Equipamento:</span>
                       <strong className="text-slate-900">
-                        {selectedGenerator.capacityKva} KVA Cinético ({selectedOption === "venda" ? quantityVenda : quantityLocacao} {selectedOption === "venda" ? (quantityVenda === 1 ? "unidade" : "unidades") : (quantityLocacao === 1 ? "unidade" : "unidades")})
+                        {selectedClientProposal?.generator_kva ?? selectedGenerator.capacityKva} KVA Cinético
                       </strong>
                     </div>
-                    {selectedOption !== "venda" ? (
+                    {(selectedClientProposal?.commercial_model ?? selectedOption) !== "venda" ? (
                       <div className="flex justify-between items-center">
                         <span>Período de Carência Comercial:</span>
-                        <strong className="text-blue-700">{financeAnalysis.gargantuaGracePeriod} Meses (Você economiza 100%)</strong>
+                        <strong className="text-blue-700">{selectedClientProposal?.grace_period_months ?? financeAnalysis.gargantuaGracePeriod} Meses (Você economiza 100%)</strong>
                       </div>
                     ) : (
                       <div className="flex justify-between items-center">
                         <span>Carência de Amortização (BNDES):</span>
-                        <strong className="text-slate-700">{bndesGraceMonths} Meses</strong>
+                        <strong className="text-slate-700">{selectedClientProposal?.grace_period_months ?? bndesGraceMonths} Meses</strong>
                       </div>
                     )}
                   </div>
@@ -3622,7 +3627,7 @@ export default function App() {
                     <div className="flex justify-between text-slate-500 mb-1.5">
                       <span>Geração Diária Média:</span>
                       <strong className="text-slate-900 font-bold">
-                        {Math.round((selectedGenerator.generationKwh * (selectedOption === "venda" ? quantityVenda : quantityLocacao)) / 30).toLocaleString("pt-BR")} kWh/dia
+                        {(selectedClientProposal?.generation_kwh ?? Math.round((selectedGenerator.generationKwh * (selectedOption === "venda" ? quantityVenda : quantityLocacao)) / 30)).toLocaleString("pt-BR")} kWh/dia
                       </strong>
                     </div>
                     <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
