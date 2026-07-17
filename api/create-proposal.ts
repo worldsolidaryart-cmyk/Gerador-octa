@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { proposalLoginEmail, proposalNumber, randomPassword, requirePost, safeError, sendMail, supabase } from './_portal.js';
+import { proposalLoginEmail, proposalNumber, randomPassword, requireAdmin, requirePost, safeError, sendMail, supabase } from './_portal.js';
 
 export default async function handler(request: VercelRequest, response: VercelResponse) {
   if (!requirePost(request, response)) return;
