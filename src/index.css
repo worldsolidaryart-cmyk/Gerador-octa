@@ -48,45 +48,60 @@
   -webkit-backdrop-filter: blur(12px);
 }
 
-/* Print Overrides definitivo - Fluxo contínuo sem esconder as seções */
+/* Print Overrides definitivo - Imprime APENAS a proposta isolada */
 @media print {
-  body {
+  /* 1. Esconde as estruturas principais da sua aplicação (painel de fundo) */
+  #root, 
+  main, 
+  nav, 
+  header, 
+  footer,
+  button,
+  .no-print,
+  div[role="notification"],
+  [class*="sidebar"],
+  [class*="Navbar"] {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* 2. Força o HTML e o Body a aceitarem múltiplas páginas de forma limpa */
+  html, body {
     background: white !important;
     color: black !important;
-  }
-
-  /* Esconde apenas elementos de interface da tela que não devem ir para o papel */
-  button,
-  nav,
-  .no-print,
-  header,
-  footer:not(.proposal-footer) {
-    display: none !important;
-  }
-
-  /* Permite que todos os elementos sigam o fluxo de renderização normal */
-  body, #root, main {
-    visibility: visible !important;
+    height: auto !important;
+    min-height: 100% !important;
     overflow: visible !important;
-    display: block !important;
+    overflow-y: visible !important;
   }
 
-  /* Garante que o modal ativo se comporte como uma página normal de documento, não travando a rolagem */
+  /* 3. Traz de volta APENAS o modal da proposta e garante que ele flua nativamente */
   .fixed {
     position: relative !important;
     display: block !important;
+    visibility: visible !important;
     left: 0 !important;
     top: 0 !important;
     width: 100% !important;
     height: auto !important;
+    min-height: auto !important;
     overflow: visible !important;
+    overflow-y: visible !important;
     box-shadow: none !important;
     padding: 0 !important;
     margin: 0 !important;
+    inset: auto !important; /* Reseta as posições fixas do Tailwind */
   }
 
+  /* Garante que tudo dentro do modal fique visível */
+  .fixed * {
+    visibility: visible !important;
+  }
+
+  /* Remove limites de altura e largura internos do modal */
   .fixed > div {
     max-width: 100% !important;
+    height: auto !important;
     border: none !important;
     box-shadow: none !important;
     margin: 0 !important;
@@ -94,12 +109,15 @@
     overflow: visible !important;
   }
 
-  /* Força todas as páginas/seções com essas classes a quebrarem de folha corretamente */
+  /* 4. Força a quebra física de página para a capa e seções */
   .page-break-after-always,
   .page-break,
-  .break-after-page {
+  .break-after-page,
+  div[class*="break-after-page"] {
     display: block !important;
     page-break-after: always !important;
     break-after: page !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
 }
