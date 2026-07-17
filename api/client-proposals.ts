@@ -9,7 +9,7 @@ export default async function handler(request: VercelRequest, response: VercelRe
     const userResponse = await supabase('/auth/v1/user', { headers: { Authorization: `Bearer ${token}` } });
     const user = await userResponse.json();
     if (!userResponse.ok) return response.status(401).json({ error: 'Sessão inválida.' });
-    const proposalsResponse = await supabase(`/rest/v1/proposals?owner_id=eq.${user.id}&select=proposal_number,customer_name,generator_kva,commercial_model,investment,proposal_content,created_at&order=created_at.desc`);
+    const proposalsResponse = await supabase(`/rest/v1/proposals?owner_id=eq.${user.id}&select=proposal_number,customer_name,generator_kva,commercial_model,investment,proposal_content,old_bill_value,client_payment,generation_kwh,grace_period_months,created_at&order=created_at.desc`);
     if (!proposalsResponse.ok) throw new Error('Não foi possível carregar as propostas.');
     return response.status(200).json({ proposals: await proposalsResponse.json() });
   } catch (error) {
