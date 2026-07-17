@@ -55,14 +55,27 @@
     color: black !important;
   }
 
-  /* Esconde tudo por padrão... */
-  body * {
-    visibility: hidden !important;
+  /* Esconde a barra de navegação, backgrounds cinzas do app e botões */
+  body > div:not(.fixed),
+  button,
+  nav,
+  .no-print {
+    display: none !important;
   }
 
-  /* ...e revela só o modal ativo (.fixed) e tudo dentro dele, não importa a profundidade */
-  .fixed, .fixed * {
+  /* Força a visibilidade ampla de toda a estrutura interna do Modal */
+  body * {
+    visibility: visible;
+  }
+
+  /* Garante de forma agressiva que as páginas da proposta (incluindo a capa) fiquem visíveis */
+  div[class*="break-after-page"],
+  div[class*="page-break"],
+  .fixed,
+  .fixed * {
     visibility: visible !important;
+    display: block !important;
+    opacity: 1 !important;
   }
 
   /* Força o modal a cobrir a página inteira e fluir nativamente */
@@ -89,10 +102,10 @@
   }
 
   /* Page Break constraints for multi-page PDF generation */
-  .page-break-after-always {
+  .page-break-after-always,
+  .page-break,
+  .break-after-page {
     page-break-after: always !important;
     break-after: page !important;
   }
 }
-
-
