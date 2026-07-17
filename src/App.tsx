@@ -250,13 +250,14 @@ export default function App() {
   const [newTicketCat, setNewTicketCat] = useState<"manutenção" | "financeiro" | "técnico" | "outros">("técnico");
 
   // CRM Pre-populated Leads
-  const [crmLeads, setCrmLeads] = useState<CRMLead[]>([
-    { id: "L-301", name: "Nome Empresário 1", company: "Empresa 1 Ltda", phone: "(11) 98765-0000", email: "empresa@empresa1.com.br", billValue: 350000, stage: "proposal", assignedAgent: "Marta Souza", createdAt: "2026-06-01" },
-    { id: "L-302", name: "Nome Empresário 2", company: "Empresa Ltda", phone: "(19) 99244-0000", email: "empresa@empresa2.com.br", billValue: 200000, stage: "closed", assignedAgent: "Diego Lima", createdAt: "2026-06-05" },
-    { id: "L-303", name: "Nome Empresário 3", company: "Empresa 3 Ltda", phone: "(21) 97111-0000", email: "empresa@empresa3.com.br", billValue: 1800000, stage: "negotiation", assignedAgent: "Marta Souza", createdAt: "2026-06-15" },
-    { id: "L-304", name: "Nome Empresário 4", company: "Empresa 4 Ltda", phone: "(43) 98877-0000", email: "empresa@empresa4.com.br", billValue: 480000, stage: "leads", assignedAgent: "Diego Lima", createdAt: "2026-06-22" }
-  ]);
-
+  const [crmLeads, setCrmLeads] = useState<CRMLead[]>([]);
+  const [newLeadName, setNewLeadName] = useState("");
+  const [newLeadCompany, setNewLeadCompany] = useState("");
+  const [newLeadPhone, setNewLeadPhone] = useState("");
+  const [newLeadEmail, setNewLeadEmail] = useState("");
+  const [newLeadBillValue, setNewLeadBillValue] = useState("");
+  const [newLeadAgent, setNewLeadAgent] = useState("");
+  
   // Pre-populated Contracts
   const [contracts, setContracts] = useState<CRMContract[]>([
     { id: "CTR-501", leadId: "L-302", clientName: "Empresa Ltda", generatorKva: 500, type: "LOCACAO", value: 1700000, monthlyFee: 100000, startDate: "2026-06-25", endDate: "2031-06-25", status: "Aguardando Assinaturas", gracePeriodMonths: 36, commissionPaid: false, version: 1 }
@@ -296,6 +297,11 @@ export default function App() {
       loadAdminProposals();
       loadAdminClients();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
+
+  useEffect(() => {
+    if (activeTab === "crm" && portalRole === "admin") loadCrmLeads();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
   
@@ -1755,14 +1761,65 @@ export default function App() {
   };
 
   // Drag and drop lead stage update simulation
-  const handleLeadStageUpdate = (leadId: string, nextStage: CRMLead["stage"]) => {
-    setCrmLeads(prev => prev.map(lead => {
-      if (lead.id === leadId) {
-        triggerToast(`Lead ${lead.company} movido para: ${nextStage}`, "success");
-        return { ...lead, stage: nextStage };
-      }
-      return lead;
-    }));
+  const loadCrmLeads = async () => {
+    if (!portalSession?.access_token) return;
+    const response = await fetch("/api/admin/leads", {
+      method: "POST", headers: { Authorization: `Bearer ${portalSession.access_token}` },
+    });
+    if (response.ok) {
+      const list = (await response.json()).leads || [];
+      setCrmLeads(list.map((l: any) => ({
+        id: l.id, name: l.name, company: l.company, phone: l.phone, email: l.email,
+        billValue: l.bill_value, stage: l.stage, assignedAgent: l.assigned_agent, createdAt: l.created_at,
+      })));
+    } else {
+      triggerToast("Não foi possível carregar os leads.", "error");
+    }
+  };
+
+  const handleAddLead = async () => {
+    if (!newLeadName || !newLeadCompany) {
+      triggerToast("Preencha ao menos nome e empresa do lead.", "error");
+      return;
+    }
+    if (!portalSession?.access_token) return;
+    try {
+      const response = await fetch("/api/admin/lead-create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${portalSession.access_token}` },
+        body: JSON.stringify({
+          name: newLeadName, company: newLeadCompany, phone: newLeadPhone, email: newLeadEmail,
+          billValue: newLeadBillValue ? Number(newLeadBillValue) : null, assignedAgent: newLeadAgent,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Não foi possível criar o lead.");
+      const l = data.lead;
+      setCrmLeads(prev => [{ id: l.id, name: l.name, company: l.company, phone: l.phone, email: l.email, billValue: l.bill_value, stage: l.stage, assignedAgent: l.assigned_agent, createdAt: l.created_at }, ...prev]);
+      setNewLeadName(""); setNewLeadCompany(""); setNewLeadPhone(""); setNewLeadEmail(""); setNewLeadBillValue(""); setNewLeadAgent("");
+      triggerToast("Lead adicionado com sucesso!", "success");
+    } catch (error: any) {
+      triggerToast(error.message || "Não foi possível criar o lead.", "error");
+    }
+  };
+
+  // Drag and drop lead stage update — agora grava de verdade no Supabase
+  const handleLeadStageUpdate = async (leadId: string, nextStage: CRMLead["stage"]) => {
+    const lead = crmLeads.find(l => l.id === leadId);
+    setCrmLeads(prev => prev.map(l => l.id === leadId ? { ...l, stage: nextStage } : l));
+    if (lead) triggerToast(`Lead ${lead.company} movido para: ${nextStage}`, "success");
+    if (!portalSession?.access_token) return;
+    try {
+      const response = await fetch("/api/admin/lead-update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${portalSession.access_token}` },
+        body: JSON.stringify({ leadId, stage: nextStage }),
+      });
+      if (!response.ok) throw new Error();
+    } catch {
+      triggerToast("Não foi possível salvar a mudança de estágio no banco.", "error");
+      await loadCrmLeads();
+    }
   };
 
   const discountFactor = 1 - factoryDiscountPercent / 100;
@@ -3828,6 +3885,16 @@ export default function App() {
                     <h3 className="text-base font-bold text-slate-900">Pipeline de Oportunidades Integrado</h3>
                     <p className="text-xs text-slate-500">Acompanhamento comercial de leads de grande porte, dimensionamento de gerador e status do projeto</p>
                   </div>
+                </div>
+
+                <div className="flex flex-wrap gap-2 mb-6 bg-slate-50 border border-slate-200 rounded-xl p-3">
+                  <input value={newLeadName} onChange={(e) => setNewLeadName(e.target.value)} placeholder="Nome" className="border border-slate-300 rounded-lg px-2 py-1.5 text-xs flex-1 min-w-[120px]" />
+                  <input value={newLeadCompany} onChange={(e) => setNewLeadCompany(e.target.value)} placeholder="Empresa" className="border border-slate-300 rounded-lg px-2 py-1.5 text-xs flex-1 min-w-[120px]" />
+                  <input value={newLeadPhone} onChange={(e) => setNewLeadPhone(e.target.value)} placeholder="Telefone" className="border border-slate-300 rounded-lg px-2 py-1.5 text-xs w-32" />
+                  <input value={newLeadEmail} onChange={(e) => setNewLeadEmail(e.target.value)} placeholder="E-mail" className="border border-slate-300 rounded-lg px-2 py-1.5 text-xs flex-1 min-w-[140px]" />
+                  <input value={newLeadBillValue} onChange={(e) => setNewLeadBillValue(e.target.value)} placeholder="Valor da conta (R$)" type="number" className="border border-slate-300 rounded-lg px-2 py-1.5 text-xs w-36" />
+                  <input value={newLeadAgent} onChange={(e) => setNewLeadAgent(e.target.value)} placeholder="Responsável" className="border border-slate-300 rounded-lg px-2 py-1.5 text-xs w-32" />
+                  <button onClick={handleAddLead} className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold">+ Novo Lead</button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
