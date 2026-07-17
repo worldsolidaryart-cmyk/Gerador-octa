@@ -3395,68 +3395,8 @@ export default function App() {
                     
           {/* TAB 4: PORTAL DO INVESTIDOR */}
           {activeTab === "investidor" && financeAnalysis && portalRole === "admin" && (
-            <div className="flex flex-col gap-6 animate-fade-in">
-          
-              {/* Configurações da Plataforma */}
-              <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm">
-                <h3 className="text-base font-bold text-slate-900 mb-1">Configurações da Plataforma</h3>
-                <p className="text-xs text-slate-500 mb-4">Regras de negócio globais — afetam todas as novas propostas geradas no site.</p>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {[
-                    { key: "bndes_annual_rate", label: "Taxa BNDES (ex: 0.085 = 8,5%)", value: bndesAnnualRate },
-                    { key: "bndes_grace_months", label: "Carência BNDES (meses)", value: bndesGraceMonths },
-                    { key: "factory_discount_percent", label: "Desconto fábrica padrão (%)", value: factoryDiscountPercent },
-                    { key: "locacao_rent_percent", label: "% Locação padrão", value: locacaoRentPercent },
-                    { key: "locacao_commission_percent", label: "Comissão padrão (%)", value: locacaoCommissionPercent },
-                    { key: "locacao_installment_percent", label: "% Sinal padrão", value: locacaoInstallmentPercent },
-                    { key: "bndes_min_revenue_multiplier", label: "Enquadramento: faturamento mín. (x investimento)", value: bndesMinRevenueMultiplier },
-                    { key: "bndes_min_years_founded", label: "Enquadramento: anos mín. de fundação", value: bndesMinYearsFounded },
-                    { key: "bndes_min_documents", label: "Enquadramento: documentos mín.", value: bndesMinDocuments },
-                  ].map((field) => (
-                    <div key={field.key}>
-                      <label className="text-[10px] text-slate-500 font-semibold block mb-1">{field.label}</label>
-                      <input
-                        type="number"
-                        step="any"
-                        defaultValue={field.value}
-                        onChange={(e) => setSettingsDraft((prev) => ({ ...prev, [field.key]: e.target.value }))}
-                        className="w-full border border-slate-300 rounded-lg px-2 py-1.5 text-xs"
-                      />
-                    </div>
-                  ))}
-                </div>
-                <button
-                  onClick={async () => {
-                    if (!portalSession?.access_token) return;
-                    const updates: Record<string, number> = {};
-                    for (const [k, v] of Object.entries(settingsDraft)) if (v !== "") updates[k] = Number(v);
-                    try {
-                      const response = await fetch("/api/settings", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json", Authorization: `Bearer ${portalSession.access_token}` },
-                        body: JSON.stringify({ action: "update", updates }),
-                      });
-                      if (!response.ok) throw new Error((await response.json()).error || "Falha ao salvar.");
-                      if (updates.bndes_annual_rate != null) setBndesAnnualRate(updates.bndes_annual_rate);
-                      if (updates.bndes_grace_months != null) setBndesGraceMonths(updates.bndes_grace_months);
-                      if (updates.factory_discount_percent != null) setFactoryDiscountPercent(updates.factory_discount_percent);
-                      if (updates.locacao_rent_percent != null) setLocacaoRentPercent(updates.locacao_rent_percent);
-                      if (updates.locacao_commission_percent != null) setLocacaoCommissionPercent(updates.locacao_commission_percent);
-                      if (updates.locacao_installment_percent != null) setLocacaoInstallmentPercent(updates.locacao_installment_percent);
-                      if (updates.bndes_min_revenue_multiplier != null) setBndesMinRevenueMultiplier(updates.bndes_min_revenue_multiplier);
-                      if (updates.bndes_min_years_founded != null) setBndesMinYearsFounded(updates.bndes_min_years_founded);
-                      if (updates.bndes_min_documents != null) setBndesMinDocuments(updates.bndes_min_documents);
-                      triggerToast("Configurações salvas com sucesso.", "success");
-                    } catch (error: any) {
-                      triggerToast(error.message || "Não foi possível salvar.", "error");
-                    }
-                  }}
-                  className="mt-4 px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold"
-                >
-                  Salvar Configurações
-                </button>
-              </div>
-          
+            <div className="flex flex-col gap-6 animate-fade-in">          
+                      
               {/* Portal de Crédito BNDES */}
               <div className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-3xl text-white shadow-xl">
                 <div className="flex flex-col md:flex-row justify-between gap-4 pb-5 border-b border-slate-800">
