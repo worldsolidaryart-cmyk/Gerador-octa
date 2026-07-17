@@ -48,60 +48,43 @@
   -webkit-backdrop-filter: blur(12px);
 }
 
-/* Print Overrides definitivo - Imprime APENAS a proposta isolada */
+/* Print Overrides to ensure only the modal target areas are printed */
 @media print {
-  /* 1. Esconde as estruturas principais da sua aplicação (painel de fundo) */
-  #root, 
-  main, 
-  nav, 
-  header, 
-  footer,
-  button,
-  .no-print,
-  div[role="notification"],
-  [class*="sidebar"],
-  [class*="Navbar"] {
-    display: none !important;
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Esconde tudo por padrão... */
+  body * {
     visibility: hidden !important;
   }
 
-  /* 2. Força o HTML e o Body a aceitarem múltiplas páginas de forma limpa */
-  html, body {
-    background: white !important;
-    color: black !important;
-    height: auto !important;
-    min-height: 100% !important;
-    overflow: visible !important;
-    overflow-y: visible !important;
+  /* CORREÇÃO CIRÚRGICA: Revela o modal ativo E garante que elementos com quebra de página (como a Capa) fiquem visíveis */
+  .fixed, 
+  .fixed *,
+  .break-after-page,
+  .page-break,
+  div[class*="break-after-page"] {
+    visibility: visible !important;
   }
 
-  /* 3. Traz de volta APENAS o modal da proposta e garante que ele flua nativamente */
+  /* Força o modal a cobrir a página inteira e fluir nativamente */
   .fixed {
-    position: relative !important;
-    display: block !important;
-    visibility: visible !important;
+    position: absolute !important;
     left: 0 !important;
     top: 0 !important;
     width: 100% !important;
     height: auto !important;
-    min-height: auto !important;
-    overflow: visible !important;
-    overflow-y: visible !important;
-    box-shadow: none !important;
+    background: white !important;
     padding: 0 !important;
     margin: 0 !important;
-    inset: auto !important; /* Reseta as posições fixas do Tailwind */
+    overflow: visible !important;
+    box-shadow: none !important;
   }
 
-  /* Garante que tudo dentro do modal fique visível */
-  .fixed * {
-    visibility: visible !important;
-  }
-
-  /* Remove limites de altura e largura internos do modal */
   .fixed > div {
     max-width: 100% !important;
-    height: auto !important;
     border: none !important;
     box-shadow: none !important;
     margin: 0 !important;
@@ -109,15 +92,9 @@
     overflow: visible !important;
   }
 
-  /* 4. Força a quebra física de página para a capa e seções */
-  .page-break-after-always,
-  .page-break,
-  .break-after-page,
-  div[class*="break-after-page"] {
-    display: block !important;
+  /* Page Break constraints for multi-page PDF generation */
+  .page-break-after-always {
     page-break-after: always !important;
     break-after: page !important;
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
   }
 }
