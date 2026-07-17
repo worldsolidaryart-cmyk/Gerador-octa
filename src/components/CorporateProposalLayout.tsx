@@ -223,10 +223,10 @@ export const CorporateProposalLayout: React.FC<CorporateProposalLayoutProps> = (
     <div className="w-full text-slate-850 font-sans print:bg-white print:text-black">
       
       {/* ==================== PAGINA 1: CAPA PROFISSIONAL (COVER) ==================== */}
-      <div className="relative min-h-[290mm] flex flex-col justify-between p-12 md:p-16 bg-white rounded-2xl shadow-xl overflow-hidden mb-12 border border-slate-200 break-after-page page-break print:min-h-screen print:h-auto print:rounded-none print:shadow-none print:border-none print:mb-0 print:p-12">
+      <div className="relative min-h-[290mm] flex flex-col justify-between p-12 md:p-16 bg-white text-slate-900 rounded-2xl shadow-xl overflow-hidden mb-12 border border-slate-200 break-after-page page-break print:min-h-screen print:h-auto print:rounded-none print:shadow-none print:border-none print:mb-0 print:p-12">
         {/* World-Class Outer Moldura / Frame */}
-        <div className="absolute inset-5 border-2 border-blue-900/10 rounded-xl pointer-events-none z-20"></div>
-        <div className="absolute inset-6 border border-blue-900/5 rounded-lg pointer-events-none z-20"></div>
+        <div className="absolute inset-5 border border-emerald-500/30 rounded-xl pointer-events-none z-20"></div>
+        <div className="absolute inset-6 border border-slate-200 rounded-lg pointer-events-none z-20"></div>
         <PageCornerDecoration isDark={false} />
 
         {/* Subtle geometric overlay accents */}
