@@ -1933,17 +1933,6 @@ export default function App() {
             <span>Portal do Cliente</span>
           </div>
 
-          <div
-            onClick={() => setActiveTab("crm")}
-            className={`px-4 py-2 rounded-md text-sm font-medium cursor-pointer transition-colors flex items-center gap-2.5 ${
-              activeTab === "crm" 
-                ? "bg-slate-800 text-white font-semibold" 
-                : "text-slate-400 hover:text-white hover:bg-slate-800/50"
-            }`}
-          >
-            <Users className="w-4 h-4" />
-            <span>CRM / Leads</span>
-          </div>
           {portalSession && (
             <div
               onClick={handlePortalLogout}
@@ -1979,8 +1968,21 @@ export default function App() {
               <span>Painel Admin: Propostas</span>
             </div>
           )}
+          {portalSession && portalRole === "admin" && (
+            <div
+              onClick={() => setActiveTab("crm")}
+              className={`px-4 py-2 rounded-md text-sm font-medium cursor-pointer transition-colors flex items-center gap-2.5 ${
+                activeTab === "crm" 
+                  ? "bg-slate-800 text-white font-semibold" 
+                  : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+              }`}
+            >
+              <Users className="w-4 h-4" />
+              <span>Painel Admin: CRM/Leads</span>
+            </div>
+          )}
         </nav>
-
+        
         {/* System Health */}
         <div className="p-4 border-t border-slate-800 space-y-4">
           <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3">
@@ -3879,7 +3881,7 @@ export default function App() {
           )}
           
           {/* TAB 6: CRM / LEADS */}
-          {activeTab === "crm" && financeAnalysis && (
+          {activeTab === "crm" && financeAnalysis && portalRole === "admin" && (
             <div className="flex flex-col gap-6 animate-fade-in">
               {/* Kanban Pipeline Stages */}
               <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm">
