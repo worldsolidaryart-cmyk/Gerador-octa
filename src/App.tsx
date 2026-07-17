@@ -123,10 +123,6 @@ export default function App() {
   const [bndesCnpj, setBndesCnpj] = useState<string>("00.000.000/0001-00");
   const [bndesAnnualRevenue, setBndesAnnualRevenue] = useState<number>(18000000); // 18M R$
   const [bndesFoundedYear, setBndesFoundedYear] = useState<number>(2012);
-  const [bndesMinRevenueMultiplier, setBndesMinRevenueMultiplier] = useState<number>(2);
-  const [bndesMinYearsFounded, setBndesMinYearsFounded] = useState<number>(2);
-  const [bndesMinDocuments, setBndesMinDocuments] = useState<number>(2);
-  const [settingsDraft, setSettingsDraft] = useState<Record<string, string>>({});
   const [bndesRepresentative, setBndesRepresentative] = useState<string>("Nome do Empresário");
   const [bndesDocuments, setBndesDocuments] = useState<Array<{ id: string; name: string; size: string; status: 'Análise' | 'Aprovado' | 'Pendente'; date: string }>>([
     { id: "doc-1", name: "Balanço_Patrimonial_2024.pdf", size: "2.4 MB", status: "Aprovado", date: "30/06/2026" },
@@ -308,26 +304,7 @@ export default function App() {
     if (activeTab === "crm" && portalRole === "admin") loadCrmLeads();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
-
-  useEffect(() => {
-    fetch("/api/settings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({}) })
-      .then((r) => r.ok ? r.json() : null)
-      .then((data) => {
-        if (!data?.settings) return;
-        const s = data.settings;
-        if (s.bndes_annual_rate != null) setBndesAnnualRate(s.bndes_annual_rate);
-        if (s.bndes_grace_months != null) setBndesGraceMonths(s.bndes_grace_months);
-        if (s.factory_discount_percent != null) setFactoryDiscountPercent(s.factory_discount_percent);
-        if (s.locacao_rent_percent != null) setLocacaoRentPercent(s.locacao_rent_percent);
-        if (s.locacao_commission_percent != null) setLocacaoCommissionPercent(s.locacao_commission_percent);
-        if (s.locacao_installment_percent != null) setLocacaoInstallmentPercent(s.locacao_installment_percent);
-        if (s.bndes_min_revenue_multiplier != null) setBndesMinRevenueMultiplier(s.bndes_min_revenue_multiplier);
-        if (s.bndes_min_years_founded != null) setBndesMinYearsFounded(s.bndes_min_years_founded);
-        if (s.bndes_min_documents != null) setBndesMinDocuments(s.bndes_min_documents);
-      })
-      .catch(() => { /* mantém os valores padrão locais se a busca falhar */ });
-  }, []);
-   
+    
   // PDF & Signature states
   const [showPrintModal, setShowPrintModal] = useState<boolean>(false);
   const [showCatalogPrintModal, setShowCatalogPrintModal] = useState<boolean>(false);
