@@ -223,147 +223,150 @@ export const CorporateProposalLayout: React.FC<CorporateProposalLayoutProps> = (
     <div className="w-full text-slate-850 font-sans print:bg-white print:text-black">
       
       {/* ==================== PAGINA 1: CAPA PROFISSIONAL (COVER) ==================== */}
-      <div className="relative min-h-[290mm] h-[297mm] max-h-[297mm] block p-12 md:p-16 bg-white text-slate-900 rounded-2xl shadow-xl overflow-hidden mb-12 border border-slate-200 break-after-page page-break print:h-[297mm] print:max-h-[297mm] print:rounded-none print:shadow-none print:border-none print:mb-0 print:p-16 print:[color-adjust:exact]">
+      <div className="relative min-h-[290mm] h-[297mm] max-h-[297mm] block p-12 md:p-16 bg-white text-slate-900 rounded-2xl shadow-xl overflow-hidden mb-12 border border-slate-200 break-after-page page-break print:h-[297mm] print:max-h-[297mm] print:min-h-[297mm] print:rounded-none print:shadow-none print:border-none print:mb-0 print:p-8 print:[color-adjust:exact] print:break-inside-avoid print:page-break-inside-avoid">
         {/* World-Class Outer Moldura / Frame */}
-        <div className="absolute inset-5 border border-emerald-500/30 rounded-xl pointer-events-none z-20"></div>
-        <div className="absolute inset-6 border border-slate-200 rounded-lg pointer-events-none z-20"></div>
+        <div className="absolute inset-5 border border-emerald-500/30 rounded-xl pointer-events-none z-20 print:inset-4"></div>
+        <div className="absolute inset-6 border border-slate-200 rounded-lg pointer-events-none z-20 print:inset-5"></div>
         <PageCornerDecoration isDark={false} />
       
         {/* Subtle geometric overlay accents */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -mr-20 -mt-20"></div>
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl -ml-20 -mb-20"></div>
+        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -mr-20 -mt-20 print:hidden"></div>
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl -ml-20 -mb-20 print:hidden"></div>
         
-        {/* Conteúdo interno estruturado sem quebrar o fluxo de impressão */}
-        <div className="h-full flex flex-col justify-between relative z-10">
+        {/* Grid estrutural vertical (Topo, Meio e Base) */}
+        <div className="h-full grid grid-rows-[auto_1fr_auto] items-stretch relative z-10 gap-4 print:gap-2">
           
-          {/* Logo and Headings inside a premium container */}
-          <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+          {/* ==================== 1. TOPO: Logo e Cabeçalhos ==================== */}
+          <div className="flex flex-col sm:flex-row justify-between items-start gap-4 pt-2">
             <div className="flex items-center gap-4">
-              <div className="bg-slate-100 p-2.5 rounded-xl border border-slate-200 shadow-md shrink-0">
-                <OctaLogoSvg className="w-20 h-20" />
+              <div className="bg-slate-100 p-2 rounded-xl border border-slate-200 shadow-md shrink-0 print:p-1.5">
+                <OctaLogoSvg className="w-16 h-16 print:w-14 print:h-14" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-3xl font-black font-display tracking-wider text-slate-900">OCTA ENERGY</span>
-                  <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200 tracking-widest uppercase shrink-0">
+                  <span className="text-2xl md:text-3xl font-black font-display tracking-wider text-slate-900 print:text-xl">OCTA ENERGY</span>
+                  <span className="text-[8px] md:text-[9px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200 tracking-widest uppercase shrink-0">
                     CINÉTICO ECOLÓGICO
                   </span>
                 </div>
-                <p className="text-xs font-mono text-slate-500 mt-1 uppercase tracking-widest">Tecnologia de Transição Energética Avançada</p>
+                <p className="text-[10px] md:text-xs font-mono text-slate-500 mt-1 uppercase tracking-widest">Tecnologia de Transição Energética Avançada</p>
               </div>
             </div>
-            <div className="text-right font-mono text-[9px] text-slate-600 border border-slate-200 bg-slate-50 p-3 rounded-lg min-w-[180px]">
+            <div className="text-right font-mono text-[9px] text-slate-600 border border-slate-200 bg-slate-50 p-2.5 rounded-lg min-w-[180px] print:p-2">
               <div>REF: PROP-OCTA-{selectedGenerator.capacityKva}KVA</div>
               <div>STATUS: PROPOSTA EXECUTIVA</div>
             </div>
           </div>
       
-          {/* Central visual block with generator model */}
-          <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12 py-6 my-auto">
-            {/* Left Column: Title and Subtitles */}
-            <div className="flex-1 space-y-4 text-center lg:text-left">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold uppercase tracking-wider">
-                <Sparkles className="w-3.5 h-3.5" /> Estudo de Viabilidade Técnico-Comercial
+          {/* ==================== 2. MEIO: Bloco Central (Grid Controlado Horizontalmente) ==================== */}
+          <div className="grid grid-cols-12 items-center gap-6 my-auto py-4 print:py-2 w-full">
+            
+            {/* Coluna da Esquerda: Título e Badges (7 partes de 12) */}
+            <div className="col-span-12 lg:col-span-7 space-y-3 text-center lg:text-left print:col-span-7 print:space-y-2">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-[10px] md:text-xs font-semibold uppercase tracking-wider">
+                <Sparkles className="w-3 h-3" /> Estudo de Viabilidade Técnico-Comercial
               </span>
-              <h1 className="text-4xl md:text-5xl font-black font-display tracking-tight text-slate-900 leading-tight">
+              <h1 className="text-3xl md:text-5xl font-black font-display tracking-tight text-slate-900 leading-tight print:text-2xl print:leading-snug">
                 PROPOSTA DE <span className="text-emerald-600 bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">INDEPENDÊNCIA</span> ENERGÉTICA
               </h1>
-              <p className="text-sm text-slate-600 leading-relaxed max-w-lg mx-auto lg:mx-0">
+              <p className="text-xs md:text-sm text-slate-600 leading-relaxed max-w-lg mx-auto lg:mx-0 print:text-[11px] print:leading-normal">
                 Implantação assistida de Gerador Cinético Magnético Magnestor de alta performance com pegada de carbono zero e 100% de estabilidade de base.
               </p>
-              <div className="pt-2 flex flex-wrap justify-center lg:justify-start gap-4">
-                <div className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-center shrink-0 min-w-[100px]">
-                  <span className="block text-[10px] text-slate-500 uppercase font-mono">Capacidade</span>
-                  <span className="text-lg font-bold text-emerald-600">{selectedGenerator.capacityKva} KVA</span>
+              
+              <div className="pt-2 flex flex-wrap justify-center lg:justify-start gap-3 print:gap-2">
+                <div className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-center shrink-0 min-w-[90px] print:p-1">
+                  <span className="block text-[9px] text-slate-500 uppercase font-mono">Capacidade</span>
+                  <span className="text-base font-bold text-emerald-600 print:text-xs">{selectedGenerator.capacityKva} KVA</span>
                 </div>
-                <div className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-center shrink-0 min-w-[100px]">
-                  <span className="block text-[10px] text-slate-500 uppercase font-mono">Potência</span>
-                  <span className="text-lg font-bold text-emerald-600">{selectedGenerator.powerKw} kW</span>
+                <div className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-center shrink-0 min-w-[90px] print:p-1">
+                  <span className="block text-[9px] text-slate-500 uppercase font-mono">Potência</span>
+                  <span className="text-base font-bold text-emerald-600 print:text-xs">{selectedGenerator.powerKw} kW</span>
                 </div>
-                <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2 text-center shrink-0 min-w-[100px]">
-                  <span className="block text-[10px] text-emerald-700 uppercase font-mono font-bold">Quantidade</span>
-                  <span className="text-lg font-extrabold text-emerald-700">{quantity} unid.</span>
+                <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-1.5 text-center shrink-0 min-w-[90px] print:p-1">
+                  <span className="block text-[9px] text-emerald-700 uppercase font-mono font-bold">Quantidade</span>
+                  <span className="text-base font-extrabold text-emerald-700 print:text-xs">{quantity} unid.</span>
                 </div>
-                <div className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-center shrink-0 min-w-[100px]">
-                  <span className="block text-[10px] text-slate-500 uppercase font-mono">Retorno (médio)</span>
-                  <span className="text-lg font-bold text-emerald-600">
-                    {selectedOption === "venda" ? `${financeAnalysis?.paybackSimple || 36} meses` : "Imediato"}
+                <div className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-center shrink-0 min-w-[90px] print:p-1">
+                  <span className="block text-[9px] text-slate-500 uppercase font-mono">Retorno (médio)</span>
+                  <span className="text-base font-bold text-emerald-600 print:text-xs">
+                    {selectedOption === "venda" ? `${financeAnalysis?.paybackSimple || 36} mes.` : "Imediato"}
                   </span>
                 </div>
               </div>
             </div>
       
-            {/* Right Column: Generator Cover Image */}
-            <div className="w-full lg:w-96 shrink-0 flex flex-col items-center">
-              <div className="relative group rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 p-2 shadow-2xl transition-all hover:border-emerald-500/50">
+            {/* Coluna da Direita: Imagem do Gerador (5 partes de 12 - Impossível vazar a margem) */}
+            <div className="col-span-12 lg:col-span-5 flex flex-col items-center print:col-span-5 w-full">
+              <div className="relative w-full group rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 p-1.5 shadow-xl flex items-center justify-center">
                 <img 
                   src={selectedGenerator.imageUrl || "/src/assets/images/octa_medium_generator_1782531660782.jpg"} 
                   alt={selectedGenerator.name} 
-                  className="w-full h-56 md:h-64 object-cover rounded-xl grayscale-[15%] group-hover:grayscale-0 transition-all duration-700"
+                  className="w-full h-48 md:h-56 object-cover rounded-xl grayscale-[15%] print:h-36 print:object-contain"
                   referrerPolicy="no-referrer"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-60"></div>
                 
                 {/* Overlay Badge */}
-                <div className="absolute bottom-5 left-5 right-5 flex justify-between items-end">
-                  <div>
-                    <span className="block text-[9px] font-mono text-emerald-400 uppercase tracking-widest font-bold">Equipamento Selecionado</span>
-                    <span className="text-sm font-bold text-white font-display">
+                <div className="absolute bottom-3 left-3 right-3 flex justify-between items-end">
+                  <div className="min-w-0 flex-1 pr-2">
+                    <span className="block text-[8px] font-mono text-emerald-400 uppercase font-bold tracking-wider">Equipamento</span>
+                    <span className="text-xs font-bold text-white truncate block">
                       {quantity > 1 ? `${quantity}x ` : ""}{selectedGenerator.name}
                     </span>
                   </div>
-                  <span className="text-[10px] font-bold text-white bg-emerald-600/90 border border-emerald-500/30 px-2.5 py-1 rounded-md shadow-sm uppercase font-mono">
-                    Base Load 24/7
+                  <span className="text-[8px] font-bold text-white bg-emerald-600/90 border border-emerald-500/30 px-2 py-0.5 rounded shadow-sm font-mono shrink-0">
+                    24/7 Load
                   </span>
                 </div>
               </div>
-              <p className="text-[10px] text-slate-500 font-mono mt-3 italic text-center">
-                *Ilustração técnica do Gerador de Energia Cinética OCTA. Patente Registrada.
+              <p className="text-[9px] text-slate-400 font-mono mt-2 italic text-center w-full truncate">
+                *Ilustração técnica do Gerador OCTA. Patente Registrada.
               </p>
             </div>
+      
           </div>
       
-          {/* Addressing and executive footer */}
-          <div className="border-t border-slate-200 pt-8 flex flex-col md:flex-row justify-between items-end gap-6">
+          {/* ==================== 3. BASE: Endereçamento e Rodapé Executivo ==================== */}
+          <div className="border-t border-slate-200 pt-4 flex flex-col md:flex-row justify-between items-end gap-4 pb-2 print:pt-2">
             {/* Executive Addressing Box */}
-            <div className="w-full md:w-auto bg-slate-50 border border-slate-200 p-5 rounded-xl space-y-3 min-w-[320px]">
-              <h4 className="text-[10px] font-bold tracking-widest text-slate-500 uppercase border-b border-slate-200 pb-1.5 flex items-center gap-2">
-                <FileCheck className="w-3.5 h-3.5 text-emerald-600" /> Detalhes de Endereçamento & Destinatário
+            <div className="w-full md:w-auto bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-2 min-w-[300px] print:p-2.5 print:space-y-1">
+              <h4 className="text-[9px] font-bold tracking-widest text-slate-500 uppercase border-b border-slate-200 pb-1 flex items-center gap-1.5">
+                <FileCheck className="w-3 h-3 text-emerald-600" /> Detalhes de Endereçamento
               </h4>
-              <div className="grid grid-cols-1 gap-2 text-xs">
+              <div className="grid grid-cols-1 gap-1 text-[11px] print:text-[10px]">
                 <div className="flex items-center gap-2">
-                  <Building className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                  <span className="text-slate-500 w-16 shrink-0 font-mono">Para:</span>
-                  <span className="text-slate-900 font-semibold truncate">{electricityBill.clientName || "Cliente Corporativo S/A"}</span>
+                  <Building className="w-3 h-3 text-slate-500 shrink-0" />
+                  <span className="text-slate-500 w-12 shrink-0 font-mono">Para:</span>
+                  <span className="text-slate-900 font-semibold truncate max-w-[200px]">{electricityBill.clientName || "Cliente Corporativo S/A"}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <User className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                  <span className="text-slate-500 w-16 shrink-0 font-mono">A/C:</span>
-                  <span className="text-slate-700">{electricityBill.clientName || "Diretoria e Gestão Operacional"}</span>
+                  <User className="w-3 h-3 text-slate-500 shrink-0" />
+                  <span className="text-slate-500 w-12 shrink-0 font-mono">A/C:</span>
+                  <span className="text-slate-700 truncate max-w-[200px]">{electricityBill.clientName || "Diretoria Executiva"}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <MapPin className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                  <span className="text-slate-500 w-16 shrink-0 font-mono">De:</span>
+                  <MapPin className="w-3 h-3 text-slate-500 shrink-0" />
+                  <span className="text-slate-500 w-12 shrink-0 font-mono">De:</span>
                   <span className="text-emerald-600 font-bold">OCTA ENERGY LTDA</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Calendar className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                  <span className="text-slate-500 w-16 shrink-0 font-mono">Data:</span>
+                  <Calendar className="w-3 h-3 text-slate-500 shrink-0" />
+                  <span className="text-slate-500 w-12 shrink-0 font-mono">Data:</span>
                   <span className="text-slate-700">{currentDateStr}</span>
                 </div>
               </div>
             </div>
       
             {/* Compliance and Certification Seals */}
-            <div className="flex items-center gap-4 text-right">
+            <div className="flex items-center gap-4 text-right print:gap-2">
               <div className="space-y-1">
-                <div className="text-[10px] text-slate-500 uppercase font-mono tracking-widest font-semibold">Compliance Corporativo</div>
-                <div className="flex flex-wrap gap-2 justify-end">
-                  <span className="text-[8px] border border-slate-200 bg-slate-50 px-2 py-1 rounded text-slate-700 font-bold font-mono">ISO 14001</span>
-                  <span className="text-[8px] border border-slate-200 bg-slate-50 px-2 py-1 rounded text-slate-700 font-bold font-mono">ISO 9001</span>
-                  <span className="text-[8px] border border-slate-200 bg-slate-50 px-2 py-1 rounded text-slate-700 font-bold font-mono">ESG CERTIFIED</span>
+                <div className="text-[9px] text-slate-500 uppercase font-mono tracking-widest font-semibold">Compliance Corporativo</div>
+                <div className="flex flex-wrap gap-1.5 justify-end">
+                  <span className="text-[7px] border border-slate-200 bg-slate-50 px-1.5 py-0.5 rounded text-slate-700 font-bold font-mono">ISO 14001</span>
+                  <span className="text-[7px] border border-slate-200 bg-slate-50 px-1.5 py-0.5 rounded text-slate-700 font-bold font-mono">ISO 9001</span>
+                  <span className="text-[7px] border border-slate-200 bg-slate-50 px-1.5 py-0.5 rounded text-slate-700 font-bold font-mono">ESG</span>
                 </div>
-                <div className="text-[8px] text-slate-400 mt-1">Este documento contém informações estritamente confidenciais e comerciais.</div>
+                <div className="text-[7px] text-slate-400 mt-1 max-w-[220px] leading-tight">Documento comercial estritamente confidencial.</div>
               </div>
             </div>
           </div>
