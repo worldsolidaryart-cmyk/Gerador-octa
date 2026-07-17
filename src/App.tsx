@@ -656,10 +656,10 @@ export default function App() {
     if (!portalSession?.access_token) return;
     const message = adminReplyDrafts[ticketId]?.trim();
     try {
-      const response = await fetch("/api/admin/ticket-reply", {
+      const response = await fetch("/api/admin/tickets", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${portalSession.access_token}` },
-        body: JSON.stringify({ ticketId, message: message || undefined, status }),
+        body: JSON.stringify({ action: "reply", ticketId, message: message || undefined, status }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Não foi possível atualizar o chamado.");
@@ -684,8 +684,10 @@ export default function App() {
 
   const loadAdminClients = async () => {
     if (!portalSession?.access_token) return;
-    const response = await fetch("/api/admin/clients", {
-      method: "POST", headers: { Authorization: `Bearer ${portalSession.access_token}` },
+    const response = await fetch("/api/admin/proposals", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${portalSession.access_token}` },
+      body: JSON.stringify({ action: "clients" }),
     });
     if (response.ok) setAdminClients((await response.json()).clients || []);
   };
@@ -693,10 +695,10 @@ export default function App() {
   const linkProposalToClient = async (proposalId: string, clientId: string) => {
     if (!portalSession?.access_token) return;
     try {
-      const response = await fetch("/api/admin/link-proposal", {
+      const response = await fetch("/api/admin/proposals", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${portalSession.access_token}` },
-        body: JSON.stringify({ proposalId, clientId: clientId || null }),
+        body: JSON.stringify({ action: "link", proposalId, clientId: clientId || null }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Não foi possível atualizar a vinculação.");
@@ -1784,10 +1786,11 @@ export default function App() {
     }
     if (!portalSession?.access_token) return;
     try {
-      const response = await fetch("/api/admin/lead-create", {
+      const response = await fetch("/api/admin/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${portalSession.access_token}` },
         body: JSON.stringify({
+          action: "create",
           name: newLeadName, company: newLeadCompany, phone: newLeadPhone, email: newLeadEmail,
           billValue: newLeadBillValue ? Number(newLeadBillValue) : null, assignedAgent: newLeadAgent,
         }),
@@ -1810,10 +1813,10 @@ export default function App() {
     if (lead) triggerToast(`Lead ${lead.company} movido para: ${nextStage}`, "success");
     if (!portalSession?.access_token) return;
     try {
-      const response = await fetch("/api/admin/lead-update", {
+      const response = await fetch("/api/admin/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${portalSession.access_token}` },
-        body: JSON.stringify({ leadId, stage: nextStage }),
+        body: JSON.stringify({ action: "update", leadId, stage: nextStage }),
       });
       if (!response.ok) throw new Error();
     } catch {
