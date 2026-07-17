@@ -3456,8 +3456,6 @@ export default function App() {
                 </button>
               </div>
 
-              <div className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-3xl text-white shadow-xl">
-                <div className="flex flex-col md:flex-row justify-between gap-4 pb-5 border-b border-slate-800">
             <div className="flex flex-col gap-6 animate-fade-in">
               <div className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-3xl text-white shadow-xl">
                 <div className="flex flex-col md:flex-row justify-between gap-4 pb-5 border-b border-slate-800">
