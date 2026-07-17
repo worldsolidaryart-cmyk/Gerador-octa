@@ -1,1 +1,1 @@
-Desenvolvido com apoio de AI Google Studio
+Desenvolvido by worldsolidaryart
