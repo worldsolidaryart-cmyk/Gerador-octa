@@ -35,7 +35,7 @@ export default async function handler(request: VercelRequest, response: VercelRe
       <p>Olá${customerName ? `, ${customerName}` : ''}. Sua proposta foi gerada e está disponível no Portal do Cliente.</p>
       <p><strong>Número da proposta (usuário):</strong> ${number}<br/>
       <strong>Senha temporária:</strong> ${password}</p>
-      <p>Acesse <a href="https://gerador-octa-sooty.vercel.app/">o Portal do Cliente</a> e informe o número da proposta e a senha. Guarde esta senha em local seguro.</p>
+      <p>Acesse <a href="https://gerador-octa.vercel.app/">o Portal do Cliente</a> e informe o número da proposta e a senha. Guarde esta senha em local seguro.</p>
     `);
     return response.status(201).json({ proposalNumber: number });
   } catch (error) {
