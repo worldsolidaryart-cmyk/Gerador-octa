@@ -1694,7 +1694,7 @@ export default function App() {
 
     fetch("/api/analyze-contract", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${portalSession?.access_token}` },
       body: JSON.stringify({
         contractText: {
           selectedOption,
