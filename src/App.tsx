@@ -3392,9 +3392,7 @@ export default function App() {
               </div>
             </div>
           )}
-
-          {/* TAB 4: PORTAL DO INVESTIDOR */}
-          {activeTab === "investidor" && financeAnalysis && portalRole === "admin" && (
+                    
             {/* TAB 4: PORTAL DO INVESTIDOR */}
           {activeTab === "investidor" && financeAnalysis && portalRole === "admin" && (
             <div className="flex flex-col gap-6 animate-fade-in">
