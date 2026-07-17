@@ -1448,70 +1448,24 @@ export default function App() {
 
   // Generate and download proposal in DOCX (MS Word .doc format)
   const downloadDOCXProposal = () => {
-    if (!generatedProposal) {
+    if (!generatedProposal && !legalAuditReport) {
       triggerToast("Por favor, gere a proposta primeiro.", "info");
       return;
     }
-    
-    const formattedContent = generatedProposal
-      .replace(/### (.*)/g, '<h3 style="color: #047857; font-size: 18px; font-weight: bold; margin-top: 18px; border-bottom: 2px solid #059669; padding-bottom: 4px; font-family: Arial, sans-serif;">$1</h3>')
-      .replace(/#### (.*)/g, '<h4 style="color: #1e293b; font-size: 14px; font-weight: bold; margin-top: 12px; margin-bottom: 4px; font-family: Arial, sans-serif;">$1</h4>')
-      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-      .replace(/\* (.*)/g, '<li style="margin-left: 20px; font-size: 12px; color: #334155; margin-bottom: 4px;">$1</li>')
-      .replace(/\n/g, '<br>');
+    const printTarget = document.getElementById("print-target-area");
+    if (!printTarget) {
+      triggerToast("Abra a visualização da proposta antes de baixar o Word.", "info");
+      return;
+    }
 
     const docHtml = `
 <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
 <head>
   <meta charset="utf-8">
   <title>Proposta Oficial - OCTA ENERGY</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      font-size: 11pt;
-      line-height: 1.5;
-      color: #334155;
-      padding: 40px;
-    }
-    h1 {
-      color: #064e3b;
-      font-size: 24px;
-      font-weight: bold;
-      border-bottom: 3px solid #059669;
-      padding-bottom: 10px;
-      margin-bottom: 20px;
-    }
-    h3 {
-      color: #047857;
-      font-size: 16px;
-      font-weight: bold;
-      border-bottom: 1px solid #a7f3d0;
-      padding-bottom: 4px;
-      margin-top: 20px;
-    }
-    h4 {
-      color: #1e293b;
-      font-size: 12px;
-      font-weight: bold;
-      margin-top: 15px;
-    }
-    strong {
-      color: #0f172a;
-    }
-  </style>
 </head>
 <body>
-  <h1>PROPOSTA TÉCNICO-COMERCIAL DE LOCAÇÃO ESTRUTURADA DE ATIVO ENERGÉTICO</h1>
-  <p><strong>Código de Referência:</strong> OCTA-LOC-2026-${selectedGenerator.capacityKva}KVA-POCONE</p>
-  <p><strong>Destinatário:</strong> Sr. Tadeu / Mineração – Poconé</p>
-  <p><strong>Proponente:</strong> OCTA ENERGIA LTDA</p>
-  <p><strong>Data de Emissão (Sincronizada):</strong> 3 de julho de 2026 às 12:28 (Horário de Brasília)</p>
-  ${isRevised ? '<p style="color: #4f46e5; font-weight: bold; font-size: 12pt;">[STATUS: PROPOSTA REVISADA OFICIALMENTE]</p>' : ''}
-  <hr style="border: 0; border-top: 1px solid #cbd5e1; margin: 20px 0;">
-  
-  <div class="content-area">
-    ${formattedContent}
-  </div>
+  ${printTarget.innerHTML}
 </body>
 </html>
     `;
